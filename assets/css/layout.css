@@ -41,6 +41,18 @@ main, .site-footer { position: relative; z-index: 1; }
 .icon-btn:hover { border-color: rgba(255, 255, 255, 0.3); }
 .icon-btn svg { width: 20px; height: 20px; }
 
+/* Sound toggle: speaker icon reflects aria-pressed */
+.sound-toggle .icon-sound-on { display: none; }
+.sound-toggle[aria-pressed="true"] .icon-sound-on { display: block; }
+.sound-toggle[aria-pressed="true"] .icon-sound-off { display: none; }
+.sound-toggle[aria-pressed="true"].icon-btn { border-color: rgba(255, 63, 164, 0.6); box-shadow: 0 0 14px rgba(255, 63, 164, 0.35); }
+.menu-sound { margin-top: 32px; align-self: flex-start; }
+/* Narrow phones: the header only has room for logo, language and menu; sound lives in the menu */
+@media (max-width: 419px) {
+  .js .header-tools .sound-toggle { display: none; }
+  .logo { gap: 9px; font-size: 0.85rem; letter-spacing: 0.16em; }
+}
+
 /* Burger → close */
 .menu-btn { display: none; }
 .burger, .burger::before, .burger::after { display: block; width: 18px; height: 2px; border-radius: 2px; background: currentColor; transition: transform 0.25s ease, opacity 0.2s ease; }

@@ -1,5 +1,6 @@
 import { initMenu } from './ui.js';
 import { initLangSwitch } from './i18n.js';
+import { createSfx } from './sfx.js';
 import { createInput } from './fx/input.js';
 import { startFx } from './fx/engine.js';
 
@@ -12,6 +13,29 @@ try {
 
 initMenu(document);
 initLangSwitch(document, storage);
+
+const sfx = createSfx({ storage, AudioCtx: window.AudioContext ?? window.webkitAudioContext });
+const soundButtons = [...document.querySelectorAll('[data-sound-toggle]')];
+const syncSound = () => soundButtons.forEach(b => b.setAttribute('aria-pressed', String(sfx.isOn())));
+soundButtons.forEach(b => {
+  b.hidden = false;
+  b.addEventListener('click', () => {
+    sfx.toggle();
+    syncSound();
+    sfx.play('tap');
+  });
+});
+syncSound();
+
+const HOVER_TARGETS = '.btn, .nav-links a, .lang-switch a, .icon-btn';
+document.addEventListener('pointerover', e => {
+  if (e.pointerType !== 'mouse') return;
+  const el = e.target.closest?.(HOVER_TARGETS);
+  if (el && !el.contains(e.relatedTarget)) sfx.play('hover');
+});
+document.addEventListener('click', e => {
+  if (e.target.closest?.('[data-lang-link]')) sfx.play('lang');
+});
 
 const bg = document.getElementById('fx-bg');
 const top = document.getElementById('fx-top');
@@ -26,5 +50,8 @@ if (bg?.getContext && top?.getContext) {
     top,
     input: createInput(window, () => performance.now()),
     reducedMotion,
+    onTap: () => {
+      if (!document.activeElement?.closest?.('[data-sound-toggle]')) sfx.play('tap');
+    },
   });
 }

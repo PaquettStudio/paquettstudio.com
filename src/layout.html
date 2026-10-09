@@ -30,6 +30,10 @@
   </nav>
   <div class="header-tools">
     {{{ langSwitchHtml }}}
+    <button id="sound-toggle" class="icon-btn sound-toggle" type="button" data-sound-toggle aria-pressed="false" aria-label="{{ t.sound.label }}" title="{{ t.sound.label }}" hidden>
+      <svg class="icon-sound-on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+      <svg class="icon-sound-off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>
+    </button>
     <button id="menu-toggle" class="icon-btn menu-btn" type="button" aria-controls="site-menu" aria-expanded="false" aria-label="{{ t.menu.open }}" data-label-open="{{ t.menu.open }}" data-label-close="{{ t.menu.close }}"><span class="burger" aria-hidden="true"></span></button>
   </div>
 </header>
@@ -42,6 +46,11 @@
       <li><a href="{{ links.home }}#contact">{{ t.nav.contact }}</a></li>
     </ul>
   </nav>
+  <button class="btn btn-ghost sound-toggle menu-sound" type="button" data-sound-toggle aria-pressed="false" hidden>
+    <svg class="icon-sound-on" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/></svg>
+    <svg class="icon-sound-off" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z"/><path d="M16 9.5l5 5M21 9.5l-5 5"/></svg>
+    <span>{{ t.sound.label }}</span>
+  </button>
 </div>
 
 <main id="main">

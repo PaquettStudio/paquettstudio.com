@@ -9,6 +9,7 @@
     "language": "Language"
   },
   "menu": { "open": "Open menu", "close": "Close menu" },
+  "sound": { "label": "Sound effects" },
   "footer": {
     "terms": "Terms of Use",
     "privacy": "Privacy Policy",
