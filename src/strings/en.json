@@ -10,6 +10,11 @@
   },
   "menu": { "open": "Open menu", "close": "Close menu" },
   "sound": { "label": "Sound effects" },
+  "legal": {
+    "updated": "Last updated:",
+    "translationNotice": "This translation is for information only; the English version prevails.",
+    "contents": "Contents"
+  },
   "footer": {
     "terms": "Terms of Use",
     "privacy": "Privacy Policy",

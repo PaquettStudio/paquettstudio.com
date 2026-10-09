@@ -79,6 +79,20 @@ function socialHtml(site) {
   return `<ul class="social">${items.join('')}</ul>`;
 }
 
+function noticeHtml(page, site, t) {
+  const isTranslation = page.lang.code !== site.languages[0].code;
+  return page.meta.layout === 'legal' && isTranslation
+    ? `<p class="translation-notice section" role="note">${escapeHtml(t.legal.translationNotice)}</p>`
+    : '';
+}
+
+function updatedHtml(page, t) {
+  if (!page.meta.updated) return '';
+  const date = new Date(`${page.meta.updated}T12:00:00Z`);
+  const label = new Intl.DateTimeFormat(page.lang.code === 'en' ? 'en-GB' : page.lang.code, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }).format(date);
+  return `<p class="updated">${escapeHtml(t.legal.updated)} <time datetime="${page.meta.updated}">${label}</time></p>`;
+}
+
 function contextFor(page, pages, site, strings, partials) {
   const { lang, meta } = page;
   const links = Object.fromEntries(Object.entries(ROUTES).map(([k, path]) => [k, urlFor(lang.prefix, path)]));
@@ -97,7 +111,8 @@ function contextFor(page, pages, site, strings, partials) {
       .filter(Boolean).map(jsonLd).join('\n'),
     socialHtml: socialHtml(site),
     headExtraHtml: headExtraHtml(page, site, partials),
-    noticeHtml: '',
+    noticeHtml: noticeHtml(page, site, strings[lang.code]),
+    updatedHtml: updatedHtml(page, strings[lang.code]),
   };
 }
 

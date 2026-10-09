@@ -107,3 +107,28 @@ test('the game page describes the game as structured data published by the compa
     assert.deepEqual(game.gamePlatform, ['iOS', 'Android']);
   }
 });
+
+const LEGAL = ['legal/terms', 'legal/privacy', 'legal/copyright'];
+const NOTICE = 'Traducere informativă; versiunea în engleză prevalează.';
+
+test('Romanian legal pages carry the translation notice, English ones do not', async () => {
+  for (const page of LEGAL) {
+    assert.ok((await read(`ro/${page}/index.html`)).includes(NOTICE), `ro/${page}`);
+    assert.ok(!(await read(`${page}/index.html`)).includes(NOTICE), page);
+  }
+});
+
+test('every legal page shows when it was last updated', async () => {
+  for (const page of LEGAL) {
+    assert.match(await read(`${page}/index.html`), /Last updated/, page);
+    assert.match(await read(`ro/${page}/index.html`), /Ultima actualizare/, `ro/${page}`);
+  }
+});
+
+test('the report page opens a pre-addressed email in both languages', async () => {
+  for (const file of ['report/index.html', 'ro/report/index.html']) {
+    const html = await read(file);
+    assert.ok(html.includes('mailto:'), file);
+    assert.ok(html.includes('Report%20a%20copy'), file);
+  }
+});

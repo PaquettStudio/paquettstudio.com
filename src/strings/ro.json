@@ -10,6 +10,11 @@
   },
   "menu": { "open": "Deschide meniul", "close": "Închide meniul" },
   "sound": { "label": "Efecte sonore" },
+  "legal": {
+    "updated": "Ultima actualizare:",
+    "translationNotice": "Traducere informativă; versiunea în engleză prevalează.",
+    "contents": "Cuprins"
+  },
   "footer": {
     "terms": "Termeni de utilizare",
     "privacy": "Politica de confidențialitate",
