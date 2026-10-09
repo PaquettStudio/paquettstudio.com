@@ -32,6 +32,7 @@ function contextFor(page, pages, site, strings) {
     t: strings[lang.code],
     site,
     page: meta,
+    layoutName: meta.layout ?? 'default',
     year: new Date().getFullYear(),
     url: urlFor(lang.prefix, meta.path),
     links,

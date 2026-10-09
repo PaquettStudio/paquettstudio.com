@@ -1,4 +1,14 @@
 {
+  "a11y": { "skip": "Sari la conținut" },
+  "nav": {
+    "main": "Principal",
+    "home": "Acasă",
+    "games": "Jocuri",
+    "studio": "Studio",
+    "contact": "Contact",
+    "language": "Limbă"
+  },
+  "menu": { "open": "Deschide meniul", "close": "Închide meniul" },
   "footer": {
     "terms": "Termeni de utilizare",
     "privacy": "Politica de confidențialitate",

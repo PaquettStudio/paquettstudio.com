@@ -1,4 +1,14 @@
 {
+  "a11y": { "skip": "Skip to content" },
+  "nav": {
+    "main": "Main",
+    "home": "Home",
+    "games": "Games",
+    "studio": "Studio",
+    "contact": "Contact",
+    "language": "Language"
+  },
+  "menu": { "open": "Open menu", "close": "Close menu" },
   "footer": {
     "terms": "Terms of Use",
     "privacy": "Privacy Policy",

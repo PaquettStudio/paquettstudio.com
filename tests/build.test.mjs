@@ -41,3 +41,13 @@ test('every page footer names the company and its number', async () => {
     assert.ok(html.includes('Registered office'), file);
   }
 });
+
+test('the layout starts as no-js and exposes an accessible menu toggle', async () => {
+  for (const file of ['index.html', 'ro/index.html']) {
+    const html = await read(file);
+    assert.match(html, /<html[^>]*class="no-js"/, file);
+    assert.ok(html.includes('aria-controls="site-menu"'), file);
+    assert.ok(html.includes('aria-expanded="false"'), file);
+    assert.ok(html.includes('id="site-menu"'), file);
+  }
+});

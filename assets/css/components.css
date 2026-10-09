@@ -1,0 +1,26 @@
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+  min-height: 48px; padding: 0 26px; border-radius: 999px; border: 1px solid transparent;
+  font: 600 0.78rem/1 var(--font-body); letter-spacing: 0.18em; text-transform: uppercase;
+  text-decoration: none; cursor: pointer; white-space: nowrap;
+  transition: transform 0.2s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
+}
+.btn:active { transform: scale(0.97); }
+.btn-primary { color: #fff; background: var(--grad-brand); box-shadow: 0 0 26px rgba(255, 63, 164, 0.35); }
+.btn-primary:hover { color: #fff; box-shadow: 0 0 40px rgba(255, 63, 164, 0.55), 0 0 18px rgba(34, 200, 255, 0.35); transform: translateY(-1px); }
+.btn-ghost {
+  color: var(--text); background: var(--glass); border-color: rgba(255, 255, 255, 0.18);
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+}
+.btn-ghost:hover { color: #fff; border-color: rgba(255, 255, 255, 0.4); background: rgba(255, 255, 255, 0.1); }
+.btn-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
+
+/* Brand title: white → lavender */
+.title-brand {
+  /* Syne 800 is wide: "PAQUETT" ≈ 7.6em, so 11vw keeps it on one line down to 320px */
+  font: 800 clamp(2.1rem, 11vw, 7rem)/0.95 var(--font-display);
+  letter-spacing: 0.01em; margin: 0; overflow-wrap: normal;
+  background: linear-gradient(180deg, #ffffff 30%, #c9c0ff 100%);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
