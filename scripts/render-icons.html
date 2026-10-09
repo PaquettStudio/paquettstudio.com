@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Icon studio</title>
+<style>
+  @font-face { font-family: "Syne"; font-weight: 800; src: url("/assets/fonts/syne-latin-800-normal.woff2") format("woff2"); }
+  @font-face { font-family: "Inter"; font-weight: 600; src: url("/assets/fonts/inter-latin-600-normal.woff2") format("woff2"); }
+  body { margin: 0; padding: 24px; background: #111; color: #eee; font: 14px system-ui; }
+  canvas { display: block; margin: 0 0 16px; max-width: 100%; height: auto; border: 1px solid #333; }
+</style>
+</head>
+<body>
+<p id="status">rendering…</p>
+<div id="out"></div>
+<script>
+const BG = '#040308';
+
+function glow(ctx, x, y, r, rgb, a) {
+  const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+  g.addColorStop(0, `rgba(${rgb},${a})`);
+  g.addColorStop(1, `rgba(${rgb},0)`);
+  ctx.fillStyle = g;
+  ctx.fillRect(x - r, y - r, r * 2, r * 2);
+}
+
+// The diamond mark from the site header: white outline, gradient core.
+function mark(ctx, cx, cy, size) {
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(Math.PI / 4);
+  const s = size / Math.SQRT2;
+  ctx.lineWidth = size * 0.085;
+  ctx.strokeStyle = '#ffffff';
+  ctx.strokeRect(-s / 2, -s / 2, s, s);
+  const inner = s * 0.56;
+  const g = ctx.createLinearGradient(-inner / 2, 0, inner / 2, 0);
+  g.addColorStop(0, '#ff3fa4'); g.addColorStop(0.55, '#7b5cff'); g.addColorStop(1, '#22c8ff');
+  ctx.fillStyle = g;
+  ctx.fillRect(-inner / 2, -inner / 2, inner, inner);
+  ctx.restore();
+}
+
+function icon(size) {
+  const c = document.createElement('canvas');
+  c.width = c.height = size;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = BG; ctx.fillRect(0, 0, size, size);
+  ctx.globalCompositeOperation = 'lighter';
+  glow(ctx, size * 0.2, size * 0.15, size * 0.8, '255,63,164', 0.32);
+  glow(ctx, size * 0.85, size * 0.35, size * 0.8, '123,92,255', 0.34);
+  glow(ctx, size * 0.4, size * 1.0, size * 0.7, '34,200,255', 0.2);
+  ctx.globalCompositeOperation = 'source-over';
+  mark(ctx, size / 2, size / 2, size * (size <= 32 ? 0.78 : 0.6));
+  return c;
+}
+
+function og() {
+  const W = 1200, H = 630;
+  const c = document.createElement('canvas');
+  c.width = W; c.height = H;
+  const ctx = c.getContext('2d');
+  ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+  ctx.globalCompositeOperation = 'lighter';
+  [['255,63,164', 0.2], ['123,92,255', 0.32], ['34,200,255', 0.44]].forEach(([rgb, yf], i) => {
+    const y0 = H * yf;
+    ctx.beginPath(); ctx.moveTo(0, H);
+    for (let x = 0; x <= W; x += W / 24) ctx.lineTo(x, y0 + Math.sin(x / W * 5 + i * 1.7) * H * 0.08 + Math.sin(x / W * 11) * H * 0.025);
+    ctx.lineTo(W, H); ctx.closePath();
+    const g = ctx.createLinearGradient(0, y0 - H * 0.12, 0, y0 + H * 0.45);
+    g.addColorStop(0, `rgba(${rgb},0)`); g.addColorStop(0.35, `rgba(${rgb},0.2)`); g.addColorStop(1, `rgba(${rgb},0)`);
+    ctx.fillStyle = g; ctx.fill();
+  });
+  let seed = 7;
+  const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+  for (let i = 0; i < 160; i++) { ctx.fillStyle = `rgba(255,255,255,${0.2 + rnd() * 0.5})`; ctx.fillRect(rnd() * W, rnd() * H * 0.75, 1.4, 1.4); }
+  ctx.globalCompositeOperation = 'source-over';
+  const hz = H * 0.74;
+  ctx.strokeStyle = 'rgba(160,140,255,0.22)'; ctx.lineWidth = 1;
+  for (let i = -16; i <= 16; i++) { ctx.beginPath(); ctx.moveTo(W / 2 + i * 8, hz); ctx.lineTo(W / 2 + i * W * 0.1, H); ctx.stroke(); }
+  for (let i = 1; i < 10; i++) { const z = i / 10, y = hz + (H - hz) * z * z; ctx.globalAlpha = z; ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke(); }
+  ctx.globalAlpha = 1;
+
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ffcf7a';
+  ctx.font = '600 22px Inter';
+  ctx.letterSpacing = '9px';
+  ctx.fillText('INDEPENDENT GAME STUDIO', W / 2, 205);
+  ctx.letterSpacing = '0px';
+  ctx.font = '800 118px Syne';
+  const tg = ctx.createLinearGradient(0, 240, 0, 420);
+  tg.addColorStop(0.3, '#ffffff'); tg.addColorStop(1, '#c9c0ff');
+  ctx.fillStyle = tg;
+  ctx.fillText('PAQUETT', W / 2, 330);
+  ctx.fillText('STUDIO', W / 2, 440);
+  ctx.fillStyle = 'rgba(242,238,255,0.75)';
+  ctx.font = '600 22px Inter';
+  ctx.letterSpacing = '4px';
+  ctx.fillText('PAQUETTSTUDIO.COM', W / 2, 560);
+  mark(ctx, 92, 92, 70);
+  return c;
+}
+
+async function save(canvas, name) {
+  document.getElementById('out').append(Object.assign(document.createElement('p'), { textContent: name }), canvas);
+  const blob = await new Promise(r => canvas.toBlob(r, 'image/png'));
+  const res = await fetch(`/save?name=${name}`, { method: 'POST', body: blob });
+  if (!res.ok) throw new Error(`${name}: ${res.status}`);
+}
+
+(async () => {
+  await Promise.all([document.fonts.load('800 118px Syne'), document.fonts.load('600 22px Inter')]);
+  await save(icon(32), 'icon-32.png');
+  await save(icon(180), 'apple-touch-icon.png');
+  await save(icon(192), 'icon-192.png');
+  await save(icon(512), 'icon-512.png');
+  await save(og(), 'og-image.png');
+  document.getElementById('status').textContent = 'done: 5 files';
+})().catch(e => { document.getElementById('status').textContent = 'error: ' + e.message; });
+</script>
+</body>
+</html>

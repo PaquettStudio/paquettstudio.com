@@ -132,3 +132,26 @@ test('the report page opens a pre-addressed email in both languages', async () =
     assert.ok(html.includes('Report%20a%20copy'), file);
   }
 });
+
+test('robots.txt points crawlers at the sitemap', async () => {
+  assert.equal(await read('robots.txt'), 'User-agent: *\nAllow: /\nSitemap: https://paquettstudio.com/sitemap.xml\n');
+});
+
+test('CNAME names the custom domain', async () => {
+  assert.equal((await read('CNAME')).trim(), 'paquettstudio.com');
+});
+
+test('the 404 page is not indexed and offers a way home in both languages', async () => {
+  const html = await read('404.html');
+  assert.ok(html.includes('<meta name="robots" content="noindex">'));
+  assert.ok(html.includes('href="/"'));
+  assert.ok(html.includes('href="/ro/"'));
+});
+
+test('pages carry social preview tags with absolute URLs', async () => {
+  const html = await read('ro/legal/terms/index.html');
+  assert.ok(html.includes('<meta property="og:image" content="https://paquettstudio.com/assets/img/og-image.png">'));
+  assert.ok(html.includes('<meta property="og:url" content="https://paquettstudio.com/ro/legal/terms/">'));
+  assert.ok(html.includes('<meta name="twitter:card" content="summary_large_image">'));
+  assert.ok(!html.includes('noindex'));
+});

@@ -3,6 +3,10 @@ import { join, dirname, resolve, relative, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { renderTemplate, escapeHtml } from './lib/template.mjs';
 import { collectPages, outputPathFor, urlFor } from './lib/pages.mjs';
+import { sitemapXml } from './lib/seo.mjs';
+
+const DOMAIN = 'paquettstudio.com';
+const OG_LOCALES = { en: 'en_GB', ro: 'ro_RO' };
 
 const ROUTES = {
   home: '/',
@@ -104,6 +108,8 @@ function contextFor(page, pages, site, strings, partials) {
     layoutName: meta.layout ?? 'default',
     year: new Date().getFullYear(),
     url: urlFor(lang.prefix, meta.path),
+    ogLocale: OG_LOCALES[lang.code] ?? lang.code,
+    robotsHtml: meta.noindex ? '<meta name="robots" content="noindex">' : '',
     links,
     alternatesHtml: alternatesHtml(page, pages, site),
     langSwitchHtml: langSwitchHtml(page, pages, site, strings[lang.code]),
@@ -147,6 +153,10 @@ export async function build({ root = process.cwd(), outDir } = {}) {
     await writeFile(join(outDir, rel), html);
     files.push(rel);
   }
+
+  await writeFile(join(outDir, 'sitemap.xml'), sitemapXml(pages, site));
+  await writeFile(join(outDir, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${site.baseUrl}/sitemap.xml\n`);
+  await writeFile(join(outDir, 'CNAME'), `${DOMAIN}\n`);
   return { files };
 }
 
