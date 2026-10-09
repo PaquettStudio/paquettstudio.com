@@ -8,13 +8,17 @@ export const UPGRADE_IDS = ['line', 'sink', 'hold', 'reach', 'reel', 'luck', 'cr
 
 // Every tuning number lives here (pacing is checked by tests/play-sim.test.mjs).
 export const ECONOMY = {
-  costBase: { line: 25, sink: 15, hold: 30, reach: 20, reel: 15, luck: 60, crew: 50, vessel: 400 },
+  costBase: { line: 45, sink: 15, hold: 30, reach: 20, reel: 15, luck: 60, crew: 50, vessel: 400 },
   max: { line: 10, sink: 10, hold: 10, reach: 10, reel: 10, luck: 10, crew: 10, vessel: 2 },
   growth: 1.6,
-  valueScale: 0.8,
+  valueScale: 0.2,
   crewRate: 0.4, // fish per minute per Crew nets level
   idleCapMinutes: 480,
   lineDepths: [120, 220, 320, 500, 750, 1000, 1300, 1650, 2000, 2250, 2500],
+  // Spawn weights per rarity (Common … Mythic); Rare and above only appear inside their own depth range.
+  rarityWeights: [60, 25, 2, 1, 0.3, 0.1],
+  luckPerLevel: 0.15,
+  inRangeBonus: 3,
 };
 
 const ZONES = [

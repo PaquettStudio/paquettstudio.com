@@ -59,20 +59,24 @@ Nu are plăți, nu are reclame și nu concurează cu jocul de pe telefon.
 
 ## 3. O aruncare
 
-1. **Cast**: butonul mare de jos, tasta Space sau un tap pe apă cât ești la suprafață. Cârligul pleacă de la vas.
-2. **Coborârea** se face automat, cu viteza dată de **Sink speed**, până la adâncimea maximă dată de **Line length**.
-3. **Ghidarea**:
+> **Modificat la implementare (2026-10-09).** Simularea de ritm a arătat că, dacă se prinde la coborâre, cala se umple mereu la suprafață și speciile din adânc nu pot fi prinse niciodată. Peștii se prind acum **doar la urcare**, iar urcarea poate începe mai devreme cu încă o apăsare.
+
+1. **Cast**: butonul mare de jos, tasta Space sau un tap pe apă cât ești la suprafață. Năluca pleacă de la vas.
+2. **Coborârea** se face automat, cu viteza dată de **Sink speed**, până la adâncimea maximă dată de **Line length**. În cădere, năluca nu prinde nimic, fiindcă e prea rapidă ca să muște ceva.
+3. **Reel in**: cât năluca coboară, butonul devine „Reel in”. O nouă apăsare (sau Space) o întoarce de unde e. Altfel se întoarce singură la capătul firului.
+4. **Ghidarea**:
    - pe telefon, ții degetul pe ecran și îl tragi stânga-dreapta;
    - pe calculator, mouse-ul sau săgețile ←/→.
 
-   Cârligul urmărește ținta cu o inerție ușoară și rămâne în lățimea zonei de joc.
-4. **Prinderea** se face automat: un pește care intră în raza cârligului (**Hook reach**) e prins, cât timp cala nu e plină.
-5. **Urcarea** pornește singură când cârligul atinge adâncimea maximă **sau** când se umple cala. Viteza o dă **Reel speed**, mai mare decât la coborâre. La urcare se prind pești doar dacă mai e loc în cală.
-6. **Rechinii** apar doar în zonele 2 și 3. Când un rechin trece pe lângă cârlig, peștii din apropiere fug: își schimbă direcția și accelerează scurt. **Rechinii nu fură niciodată captura.**
+   Năluca urmărește ținta cu o inerție ușoară și rămâne în lățimea zonei de joc.
+5. **Prinderea**, doar la urcare: un pește care intră în raza nălucii (**Hook reach**) e prins, cât timp mai e loc în cală (**Hold size**). Urcarea se face cu **Reel speed**.
+6. **Rechinii** apar doar în zonele 2 și 3. Când un rechin trece pe lângă nălucă, peștii din apropiere fug: își schimbă direcția și accelerează scurt. **Rechinii nu fură niciodată captura.**
 7. **La suprafață**:
    - captura se vinde automat, cu monedele animate spre bara de sus;
    - fiecare specie nouă primește un cartonaș scurt, „New species!”, cu ilustrația și greutatea;
    - butonul Cast reapare.
+
+**Ritmul** (testul de ritm cu seed fix, jucător mediu): Twilight Trench se deblochează la ~8 min, The Abyss la ~31 min, iar colecția e completă la ~2 h. Speciile Rare și peste apar doar în intervalul lor de adâncime.
 
 ## 4. Zone, specii, economie
 
