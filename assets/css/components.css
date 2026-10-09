@@ -153,7 +153,10 @@
 }
 .contact-report { margin: 0; color: var(--text-soft); }
 .social { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 20px; margin: 0 0 18px; padding: 0; list-style: none; }
-.social a { display: inline-flex; align-items: center; min-height: 44px; }
+.social a { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; }
+.site-footer .social { justify-content: flex-start; margin: 0; }
+.site-footer .social a { color: var(--text-soft); text-decoration: none; }
+.site-footer .social a:hover { color: #fff; }
 
 /* Game page */
 .page-game main { padding-top: 0; }

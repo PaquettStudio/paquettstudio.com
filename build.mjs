@@ -59,6 +59,8 @@ export function organizationLd(site) {
     logo: `${site.baseUrl}/assets/img/icon-512.png`,
     email: c.emailContact,
     address: { '@type': 'PostalAddress', streetAddress: c.office },
+    // Ties the studio's own social accounts to the company, so copies are easier to tell apart.
+    ...(site.social?.length ? { sameAs: site.social.map(s => s.url) } : {}),
   };
 }
 
@@ -79,9 +81,19 @@ export function videoGameLd(site, gameKey, url) {
   };
 }
 
+const SOCIAL_ICONS = {
+  tiktok: '<path d="M14 3v11.5a3.5 3.5 0 1 1-3.5-3.5"/><path d="M14 3c.4 2.7 2.3 4.6 5 4.9"/>',
+  instagram: '<rect x="3.5" y="3.5" width="17" height="17" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="0.6" fill="currentColor"/>',
+};
+
 function socialHtml(site) {
   if (!site.social?.length) return '';
-  const items = site.social.map(s => `<li><a href="${escapeHtml(s.url)}" rel="me noopener">${escapeHtml(s.name)}</a></li>`);
+  const items = site.social.map(s => {
+    const icon = SOCIAL_ICONS[s.icon]
+      ? `<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SOCIAL_ICONS[s.icon]}</svg>`
+      : '';
+    return `<li><a href="${escapeHtml(s.url)}" rel="me noopener">${icon}<span>${escapeHtml(s.name)}</span></a></li>`;
+  });
   return `<ul class="social">${items.join('')}</ul>`;
 }
 

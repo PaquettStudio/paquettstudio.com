@@ -21,5 +21,8 @@
       "privacyPolicy": "https://paquettstudio.github.io/abyss-angler/"
     }
   },
-  "social": []
+  "social": [
+    { "name": "TikTok", "icon": "tiktok", "url": "https://www.tiktok.com/@paquettstudio" },
+    { "name": "Instagram", "icon": "instagram", "url": "https://www.instagram.com/paquettstudio/" }
+  ]
 }

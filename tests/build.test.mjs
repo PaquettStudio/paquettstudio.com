@@ -165,3 +165,19 @@ test('the privacy policy states legal bases and does not overclaim anonymity', a
   assert.ok(!/anonim/i.test(ro), 'RO must not call identifier-linked data anonymous');
   assert.match(en, /ad networks/);
 });
+
+const SOCIAL = ['https://www.tiktok.com/@paquettstudio', 'https://www.instagram.com/paquettstudio/'];
+
+test('the studio TikTok and Instagram are linked from contact, every footer and the organisation data', async () => {
+  const home = await read('index.html');
+  const contact = home.slice(home.indexOf('id="contact"'));
+  for (const url of SOCIAL) assert.ok(contact.includes(`href="${url}"`), `contact: ${url}`);
+  for (const file of ['index.html', 'legal/privacy/index.html', 'games/abyss-angler/index.html', 'ro/index.html']) {
+    const html = await read(file);
+    const footer = html.slice(html.indexOf('<footer'), html.indexOf('</footer>'));
+    for (const url of SOCIAL) assert.match(footer, new RegExp(`href="${url}" rel="me noopener"`), `${file}: ${url}`);
+  }
+  const org = [...home.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)]
+    .map(m => JSON.parse(m[1])).find(b => b['@type'] === 'Organization');
+  assert.deepEqual(org.sameAs, SOCIAL);
+});
