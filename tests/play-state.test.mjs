@@ -2,7 +2,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import {
   ECONOMY, UPGRADE_IDS, createState, upgradeCost, derived, unlockedZoneIds, fishValue,
-  buy, sell, idleEarnings, collectIdle, touch, save, load, reset, SAVE_KEY,
+  buy, sell, idleEarnings, collectIdle, touch, save, load, reset, SAVE_KEY, arrive, bank, keepPending,
 } from '../assets/js/play/state.js';
 
 const MIN = 60_000;
@@ -156,4 +156,35 @@ test('reset clears the save but keeps a backup', () => {
   reset(storage);
   assert.equal(storage.getItem(SAVE_KEY), null);
   assert.equal(storage.data[`${SAVE_KEY}.bak`], before);
+});
+
+test('coming back to a hidden page shows what the crew earned, and banks it once', () => {
+  const hiddenAt = Date.UTC(2026, 9, 9, 12);
+  const state = withLevels({ crew: 3 }, { lastSeen: hiddenAt, collection: { anchovy: 0.03 } });
+  const back = hiddenAt + 180 * MIN;
+  const visit = arrive(state, back, byId);
+  assert.equal(visit.pending.minutes, 180);
+  assert.equal(visit.pending.coins, idleEarnings(state, back, byId).coins);
+  assert.equal(visit.state.lastSeen, hiddenAt, 'the clock waits until the coins are banked');
+  const banked = bank(visit.state, visit.pending, back + 2 * MIN);
+  assert.equal(banked.coins, state.coins + visit.pending.coins);
+  assert.equal(banked.lastSeen, back + 2 * MIN);
+  assert.equal(arrive(banked, back + 2 * MIN, byId).pending, null, 'time spent with the page open is not idle time');
+});
+
+test('a short absence with nothing earned just moves the clock', () => {
+  const now = Date.UTC(2026, 9, 9, 12);
+  const visit = arrive(withLevels({ crew: 3 }, { lastSeen: now - 30_000, collection: { anchovy: 0.03 } }), now, byId);
+  assert.equal(visit.pending, null);
+  assert.equal(visit.state.lastSeen, now);
+});
+
+test('earnings another tab already banked are not banked again', () => {
+  const now = Date.UTC(2026, 9, 9, 12);
+  const state = withLevels({ crew: 3 }, { lastSeen: now - 60 * MIN, collection: { anchovy: 0.03 } });
+  const visit = arrive(state, now, byId);
+  assert.equal(keepPending(visit.pending, state), visit.pending);
+  const otherTab = bank(state, visit.pending, now + MIN);
+  assert.equal(keepPending(visit.pending, otherTab), null);
+  assert.equal(keepPending(null, otherTab), null);
 });

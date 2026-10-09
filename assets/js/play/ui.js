@@ -72,7 +72,9 @@ export function collectionView(state, species, zones) {
       cards: species.filter(s => s.zone === zone.id).map(s => {
         const weight = state.collection[s.id];
         const known = weight !== undefined;
-        return { id: s.id, art: s.art, known, label: known ? s.name : '???', detail: known ? kg(weight) : '' };
+        // Unseen species hint at where they swim, so the last few can be found.
+        const depths = `${Math.round(s.depthMin)}–${Math.round(s.depthMax)} m`;
+        return { id: s.id, art: s.art, known, label: known ? s.name : '???', detail: known ? kg(weight) : depths };
       }),
     })),
   };
@@ -125,6 +127,8 @@ export function createUi(root, { species, zones, speciesById, sessionStore, onBu
   const coinsPill = hud.querySelector('.play-coins');
   const zoneAt = depth => (zones.find(z => depth >= z.top && depth < z.bottom) ?? zones[zones.length - 1]).name;
   castButton.addEventListener('click', () => onCast());
+  // Holding Enter on the button would repeat clicks and reel straight back in.
+  castButton.addEventListener('keydown', e => { if (e.repeat) e.preventDefault(); });
 
   // Upgrades: rows built once, refreshed in place so focus never jumps.
   upgradesEl.innerHTML = `<ul class="play-upgrades">${UPGRADE_IDS.map(id => `
@@ -300,7 +304,7 @@ export function createUi(root, { species, zones, speciesById, sessionStore, onBu
               <li class="play-fish${c.known ? '' : ' is-unknown'}">
                 <img src="/${esc(c.art)}" alt="" width="64" height="40" loading="lazy">
                 <span class="play-fish-name">${c.known ? esc(c.label) : '<span aria-hidden="true">???</span><span class="visually-hidden">Not caught yet</span>'}</span>
-                ${c.known ? `<span class="play-fish-weight">${c.detail}</span>` : ''}
+                <span class="play-fish-weight">${c.detail}</span>
               </li>`).join('')}
             </ul>
           </section>`).join('')

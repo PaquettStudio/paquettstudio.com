@@ -13,7 +13,9 @@ export function createSteer(target, getRect, keyTarget = target) {
     const r = getRect();
     if (r.width > 0) targetX01 = clamp01((e.clientX - r.left) / r.width);
   };
+  // Space and Enter belong to whatever control has focus; arrows only to fields you type in.
   const ownedByControl = e => !!e.target?.closest?.('button, a, input, select, textarea');
+  const typing = e => !!e.target?.closest?.('input, select, textarea, [contenteditable]');
 
   target.addEventListener('pointerdown', e => { pressed = true; fromPointer(e); });
   target.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' || pressed) fromPointer(e); });
@@ -22,10 +24,10 @@ export function createSteer(target, getRect, keyTarget = target) {
   target.addEventListener('pointercancel', release);
 
   keyTarget.addEventListener('keydown', e => {
-    if (ownedByControl(e)) return;
+    if (typing(e)) return;
     if (e.key === 'ArrowLeft') { targetX01 = clamp01(Math.round((targetX01 - KEY_STEP) * 1000) / 1000); e.preventDefault(); }
     else if (e.key === 'ArrowRight') { targetX01 = clamp01(Math.round((targetX01 + KEY_STEP) * 1000) / 1000); e.preventDefault(); }
-    else if (e.key === ' ' || e.key === 'Enter') {
+    else if ((e.key === ' ' || e.key === 'Enter') && !ownedByControl(e)) {
       e.preventDefault();
       if (!e.repeat) castListeners.forEach(cb => cb());
     }

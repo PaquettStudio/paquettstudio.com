@@ -13,6 +13,7 @@ const SHARK_EVERY = 150; // metres of descent between sharks, on average
 const SHARK_SCARE = 12; // shark-to-hook distance that frightens fish
 const SCARE_RADIUS = 15;
 const SCARE_SECONDS = 1.5;
+const REEL_IN_AFTER = 0.5; // seconds: a double tap on Cast must not cancel the cast
 
 // mulberry32: small, fast, good enough for a game.
 export function createRng(seed) {
@@ -172,7 +173,7 @@ export function stepCast(cast, dt, { targetX }, rng) {
 
 // Tap again while the lure falls: it turns around and starts fishing on the way up.
 export function reelIn(cast) {
-  if (!cast || cast.phase !== 'sinking') return false;
+  if (!cast || cast.phase !== 'sinking' || cast.time < REEL_IN_AFTER) return false;
   cast.phase = 'reeling';
   return true;
 }

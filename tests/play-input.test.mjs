@@ -81,3 +81,14 @@ test('keys can be heard page-wide while only the sea takes the pointer', () => {
   page.dispatchEvent(event('pointermove', { pointerType: 'mouse', clientX: 100 }));
   assert.ok(Math.abs(steer.targetX01 - 0.54) < 1e-9, 'the mouse over the page does not steer');
 });
+
+test('arrow keys steer while a button has focus, but not while typing', () => {
+  const target = new EventTarget();
+  const steer = createSteer(target, rect);
+  const onButton = { closest: sel => (sel.includes('button') ? {} : null) };
+  const inTextField = { closest: sel => (sel.includes('input') ? {} : null) };
+  target.dispatchEvent(event('keydown', { key: 'ArrowRight', target: onButton }));
+  assert.ok(Math.abs(steer.targetX01 - 0.54) < 1e-9, String(steer.targetX01));
+  target.dispatchEvent(event('keydown', { key: 'ArrowRight', target: inTextField }));
+  assert.ok(Math.abs(steer.targetX01 - 0.54) < 1e-9, String(steer.targetX01));
+});

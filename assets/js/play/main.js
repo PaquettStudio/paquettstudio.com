@@ -1,6 +1,6 @@
 // Abyss Angler Idle — wires data, state, simulation, input, drawing and panels into one loop.
 import { loadData } from './data.js';
-import { load, save, touch, buy, reset, idleEarnings, ECONOMY } from './state.js';
+import { load, save, touch, buy, reset, arrive, bank, keepPending, SAVE_KEY, ECONOMY } from './state.js';
 import { WORLD_WIDTH, createRng, createSession, requestCast, stepCast, finishCast, reelIn } from './sim.js';
 import { createSteer } from './input.js';
 import { createRenderer } from './render.js';
@@ -36,14 +36,10 @@ async function start() {
   const session = createSession();
   const rng = createRng((Date.now() ^ 0x5eed) >>> 0);
 
-  // Idle earnings are counted once, up to the moment the page opened. Until they are
-  // collected, lastSeen stays where it was so closing the page early loses nothing.
-  const openedAt = Date.now();
-  let pending = idleEarnings(state, openedAt, speciesById);
-  if (!(pending.minutes > 1 && pending.coins > 0)) pending = null;
+  // Crew earnings wait on a card until banked; meanwhile lastSeen stays put (see arrive in state.js).
+  let pending = null;
+  let hideWelcome = null;
   const stamp = s => (pending ? s : touch(s, Date.now()));
-  state = stamp(state);
-  save(storage, state);
 
   const images = {
     vessel: [0, 1, 2].map(i => loadImage(`/assets/img/play/vessel-${i}.webp`)),
@@ -59,13 +55,28 @@ async function start() {
     ui.render(state, session.cast);
   }
 
-  let hideWelcome = null;
+  // Called when the page opens and every time it is shown again.
+  function arriveNow() {
+    if (pending) return;
+    const visit = arrive(state, Date.now(), speciesById);
+    state = visit.state;
+    pending = visit.pending;
+    save(storage, state);
+    if (pending) hideWelcome = ui.showWelcomeBack(pending);
+  }
+
+  function dropWelcome() {
+    hideWelcome?.();
+    hideWelcome = null;
+  }
+
   function collect({ quiet = false } = {}) {
     if (!pending) return;
-    const coins = pending.coins;
+    const { coins } = pending;
+    const banked = bank(state, pending, Date.now());
     pending = null;
-    hideWelcome?.();
-    commit({ ...state, coins: state.coins + coins });
+    dropWelcome();
+    commit(banked);
     if (quiet) return;
     sound('coins');
     ui.announce(`Collected ${coins.toLocaleString('en-GB')} coins`);
@@ -93,7 +104,7 @@ async function start() {
     onReset() {
       reset(storage);
       pending = null;
-      hideWelcome?.();
+      dropWelcome();
       session.cast = null;
       commit(load(storage));
     },
@@ -146,8 +157,19 @@ async function start() {
   // Leaving with the welcome card still open banks the coins, so open time never counts as idle.
   const pause = () => { running = false; collect({ quiet: true }); persist(); };
 
-  document.addEventListener('visibilitychange', () => (document.hidden ? pause() : resume()));
+  const show = () => { arriveNow(); resume(); };
+  document.addEventListener('visibilitychange', () => (document.hidden ? pause() : show()));
   window.addEventListener('pagehide', pause);
+  window.addEventListener('pageshow', e => { if (e.persisted) show(); });
+  // Another tab saved (or reset): take its progress rather than later writing stale progress over it.
+  window.addEventListener('storage', e => {
+    if ((e.key !== SAVE_KEY && e.key !== null) || !storage || e.storageArea !== storage) return;
+    const saved = load(storage);
+    pending = keepPending(pending, saved);
+    if (!pending) dropWelcome();
+    state = saved;
+    ui.render(state, session.cast);
+  });
   // Resizing clears the canvas; redraw at once so a paused sea never goes blank.
   window.addEventListener('resize', () => { renderer.resize(); drawScene(performance.now()); });
   setInterval(() => { if (running) persist(); }, 30_000);
@@ -155,7 +177,8 @@ async function start() {
   renderer.resize();
   drawScene(performance.now());
   ui.render(state, null);
-  if (pending) hideWelcome = ui.showWelcomeBack(pending);
+  arriveNow();
+  ui.render(state, null);
   if (!document.hidden) resume();
   return { get state() { return state; }, get cast() { return session.cast; }, ui };
 }

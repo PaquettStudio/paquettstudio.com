@@ -121,6 +121,26 @@ export function collectIdle(state, now, speciesById) {
   return next;
 }
 
+// A visit: when the page is opened or shown again, what the crew earned since lastSeen waits
+// on a "Welcome back" card. lastSeen stays put until it is banked, so nothing is lost and
+// time spent with the page open never counts as idle time.
+export function arrive(state, now, speciesById) {
+  const earned = idleEarnings(state, now, speciesById);
+  if (earned.minutes > 1 && earned.coins > 0) return { state, pending: { ...earned, since: state.lastSeen } };
+  return { state: touch(state, now), pending: null };
+}
+
+export function bank(state, pending, now) {
+  const next = touch(state, now);
+  if (pending) next.coins += pending.coins;
+  return next;
+}
+
+// Another tab saved: the earnings are still ours to bank only if nobody has moved lastSeen since.
+export function keepPending(pending, saved) {
+  return pending && saved.lastSeen === pending.since ? pending : null;
+}
+
 export function touch(state, now) {
   const next = clone(state);
   next.lastSeen = now;

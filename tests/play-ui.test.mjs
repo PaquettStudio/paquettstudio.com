@@ -78,3 +78,11 @@ test('tiny fish are weighed in grams instead of 0.0 kg', () => {
   assert.equal(caughtText({ name: 'Spotted Lanternfish' }, 0.0004), 'Caught Spotted Lanternfish, 1 g');
   assert.equal(caughtText({ name: 'Salema' }, 0.1), 'Caught Salema, 0.1 kg');
 });
+
+test('species not caught yet hint at the depth where they swim', () => {
+  const view = collectionView(createState(), species, zones);
+  for (const card of view.zones.flatMap(z => z.cards)) {
+    const s = species.find(x => x.id === card.id);
+    assert.equal(card.detail, `${Math.round(s.depthMin)}–${Math.round(s.depthMax)} m`, card.id);
+  }
+});

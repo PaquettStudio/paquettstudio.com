@@ -111,6 +111,7 @@ function simulatePlayer(minutes) {
     requestCast(session, state, data.species, rng);
     const cast = session.cast;
     const missing = data.species.filter(s => !(s.id in state.collection) && unlockedZoneIds(state).includes(s.zone));
+    // The player sees each missing species' depth range on its collection card, so the bot may use it.
     const turnAt = missing.length ? Math.max(...missing.map(s => s.depthMax)) + 10 : Infinity;
     while (cast.phase !== 'done') {
       if (cast.phase === 'sinking' && cast.hook.depth >= turnAt) reelIn(cast);
@@ -140,4 +141,15 @@ test('pacing: zones unlock around 10 and 30 minutes, the collection takes 1–2 
   assert.ok(marks.twilight >= 5 && marks.twilight <= 15, `twilight at ${marks.twilight?.toFixed(1)} min`);
   assert.ok(marks.abyss >= 20 && marks.abyss <= 45, `abyss at ${marks.abyss?.toFixed(1)} min`);
   assert.ok(marks.complete >= 60 && marks.complete <= 150, `complete at ${marks.complete?.toFixed(1)} min`);
+});
+
+test('a second press right after casting does not cancel the cast', () => {
+  const session = createSession();
+  requestCast(session, withLevels({ line: 3 }), [], createRng(8));
+  const cast = session.cast;
+  for (let i = 0; i < 4; i++) stepCast(cast, 0.05, { targetX: 30 }, createRng(8));
+  assert.equal(reelIn(cast), false);
+  assert.equal(cast.phase, 'sinking');
+  for (let i = 0; i < 8; i++) stepCast(cast, 0.05, { targetX: 30 }, createRng(8));
+  assert.equal(reelIn(cast), true);
 });
