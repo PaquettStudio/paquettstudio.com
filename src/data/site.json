@@ -6,17 +6,18 @@
   ],
   "company": {
     "legalName": "Paquett Studio Ltd",
-    "number": "[[DE COMPLETAT]]",
-    "jurisdiction": "[[DE COMPLETAT]]",
-    "office": "[[DE COMPLETAT]]",
+    "number": "NI743931",
+    "jurisdiction": "Northern Ireland",
+    "office": "5 Edfield Park, Fivemiletown, BT75 0QN, Northern Ireland",
     "emailContact": "[[DE COMPLETAT]]",
     "emailLegal": "[[DE COMPLETAT]]"
   },
   "games": {
     "abyssAngler": {
       "name": "Abyss Angler",
-      "appStore": "[[DE COMPLETAT]]",
-      "googlePlay": "[[DE COMPLETAT]]",
+      "appStore": "https://apps.apple.com/app/id6801600805",
+      "googlePlay": "https://play.google.com/store/apps/details?id=com.paquettstudio.abyssangler",
+      "privacyPolicy": "https://paquettstudio.github.io/abyss-angler/",
       "releaseIos": "[[DE COMPLETAT]]",
       "releaseAndroid": "[[DE COMPLETAT]]"
     }

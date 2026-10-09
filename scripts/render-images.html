@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Image studio</title>
+<style>
+  body { margin: 0; padding: 24px; background: #111; color: #eee; font: 14px system-ui; }
+  canvas { display: block; margin: 0 0 16px; max-width: 100%; max-height: 360px; width: auto; border: 1px solid #333; }
+</style>
+</head>
+<body>
+<p id="status">rendering…</p>
+<div id="out"></div>
+<script>
+const load = key => new Promise((ok, fail) => {
+  const img = new Image();
+  img.onload = () => ok(img);
+  img.onerror = () => fail(new Error(`cannot load ${key}`));
+  img.src = `/src/${key}`;
+});
+
+function draw(img, w, h, sx = 0, sy = 0, sw = img.naturalWidth, sh = img.naturalHeight) {
+  const c = document.createElement('canvas');
+  c.width = w; c.height = h;
+  const ctx = c.getContext('2d');
+  ctx.imageSmoothingQuality = 'high';
+  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, w, h);
+  return c;
+}
+
+async function save(canvas, name, quality = 0.84) {
+  document.getElementById('out').append(Object.assign(document.createElement('p'), { textContent: name }), canvas);
+  const blob = await new Promise(r => canvas.toBlob(r, 'image/webp', quality));
+  const res = await fetch(`/save?name=${name}`, { method: 'POST', body: blob });
+  if (!res.ok) throw new Error(`${name}: ${res.status}`);
+  return blob.size;
+}
+
+(async () => {
+  const sizes = {};
+  const icon = await load('icon');
+  // Key art: a 16:9 band of the app icon (the shark's eye, jaws and the lure).
+  sizes['key-art.webp'] = await save(draw(icon, 1024, 576, 0, 120, 1024, 576), 'key-art.webp');
+  sizes['app-icon.webp'] = await save(draw(icon, 256, 256), 'app-icon.webp', 0.9);
+  for (const n of [1, 2, 3, 4]) {
+    const shot = await load(`shot-${n}`);
+    sizes[`shot-${n}.webp`] = await save(draw(shot, 460, 1000), `shot-${n}.webp`);
+  }
+  document.getElementById('status').textContent = 'done: ' + JSON.stringify(sizes);
+})().catch(e => { document.getElementById('status').textContent = 'error: ' + e.message; });
+</script>
+</body>
+</html>

@@ -84,17 +84,17 @@ export function initGallery(doc) {
     if (!track || !prev || !next) continue;
     const step = () => (track.querySelector('.shot')?.getBoundingClientRect().width ?? track.clientWidth) + 16;
     const update = () => {
+      const overflows = track.scrollWidth > track.clientWidth + 2;
+      prev.hidden = next.hidden = !finePointer || !overflows;
       prev.disabled = track.scrollLeft <= 2;
       next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
     };
-    if (finePointer) {
-      prev.hidden = false;
-      next.hidden = false;
-    }
     prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
     next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
     track.addEventListener('scroll', update, { passive: true });
     win.addEventListener('resize', update);
+    // Lazy screenshots change the track width once they load.
+    track.querySelectorAll('img').forEach(img => img.addEventListener('load', update));
     update();
   }
 }
