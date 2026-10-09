@@ -16,6 +16,18 @@
 .btn-ghost:hover { color: #fff; border-color: rgba(255, 255, 255, 0.4); background: rgba(255, 255, 255, 0.1); }
 .btn-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px; }
 
+/* Language switch: segmented EN | RO pill */
+.lang-switch {
+  display: inline-flex; border-radius: 999px; border: 1px solid rgba(255, 255, 255, 0.18);
+  background: var(--glass); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
+}
+.lang-switch a {
+  display: inline-grid; place-items: center; min-width: 44px; min-height: 44px; padding: 0 12px; border-radius: 999px;
+  color: var(--text-soft); text-decoration: none; font: 600 0.75rem/1 var(--font-body); letter-spacing: 0.12em;
+}
+.lang-switch a:hover { color: #fff; }
+.lang-switch a[aria-current="true"] { color: #fff; background: linear-gradient(90deg, var(--pink), var(--violet)); }
+
 /* Brand title: white → lavender */
 .title-brand {
   /* Syne 800 is wide: "PAQUETT" ≈ 7.6em, so 11vw keeps it on one line down to 320px */

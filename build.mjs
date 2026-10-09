@@ -1,7 +1,7 @@
 import { readFile, writeFile, mkdir, rm, cp } from 'node:fs/promises';
 import { join, dirname, resolve, relative, isAbsolute } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import { renderTemplate } from './lib/template.mjs';
+import { renderTemplate, escapeHtml } from './lib/template.mjs';
 import { collectPages, outputPathFor, urlFor } from './lib/pages.mjs';
 
 const ROUTES = {
@@ -24,7 +24,22 @@ function alternatesHtml(page, pages, site) {
   return links.join('\n');
 }
 
-function contextFor(page, pages, site, strings) {
+function langSwitchHtml(page, pages, site, t) {
+  const items = site.languages.map(lang => {
+    const target = pages.find(p => p.meta.id === page.meta.id && p.lang.code === lang.code);
+    const href = urlFor(lang.prefix, target && !page.meta.single ? target.meta.path : '/');
+    const current = lang.code === page.lang.code;
+    return `<a href="${href}" hreflang="${lang.code}" lang="${lang.code}" data-lang-link="${lang.code}" aria-current="${current}">${escapeHtml(lang.label)}</a>`;
+  });
+  return `<nav class="lang-switch" aria-label="${escapeHtml(t.nav.language)}">${items.join('')}</nav>`;
+}
+
+function headExtraHtml(page, site, partials) {
+  const isDefaultHome = page.meta.id === 'home' && page.lang.code === site.languages[0].code;
+  return isDefaultHome ? `<script data-lang-redirect>${partials.langRedirect.trim()}</script>` : '';
+}
+
+function contextFor(page, pages, site, strings, partials) {
   const { lang, meta } = page;
   const links = Object.fromEntries(Object.entries(ROUTES).map(([k, path]) => [k, urlFor(lang.prefix, path)]));
   return {
@@ -37,9 +52,9 @@ function contextFor(page, pages, site, strings) {
     url: urlFor(lang.prefix, meta.path),
     links,
     alternatesHtml: alternatesHtml(page, pages, site),
-    langSwitchHtml: '',
+    langSwitchHtml: langSwitchHtml(page, pages, site, strings[lang.code]),
     jsonLdHtml: '',
-    headExtraHtml: '',
+    headExtraHtml: headExtraHtml(page, site, partials),
     noticeHtml: '',
   };
 }
@@ -59,6 +74,7 @@ export async function build({ root = process.cwd(), outDir } = {}) {
   const strings = {};
   for (const lang of site.languages) strings[lang.code] = await readJson(join(root, `src/strings/${lang.code}.json`));
   const pages = await collectPages(join(root, 'src/pages'), site.languages);
+  const partials = { langRedirect: await readFile(join(root, 'src/partials/lang-redirect.js'), 'utf8') };
 
   await rm(outDir, { recursive: true, force: true });
   await mkdir(outDir, { recursive: true });
@@ -66,7 +82,7 @@ export async function build({ root = process.cwd(), outDir } = {}) {
 
   const files = [];
   for (const page of pages) {
-    const ctx = contextFor(page, pages, site, strings);
+    const ctx = contextFor(page, pages, site, strings, partials);
     const content = renderTemplate(page.body, ctx);
     const html = renderTemplate(layout, { ...ctx, content });
     const rel = outputPathFor(page.lang.prefix, page.meta.path);

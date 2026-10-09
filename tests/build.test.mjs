@@ -51,3 +51,14 @@ test('the layout starts as no-js and exposes an accessible menu toggle', async (
     assert.ok(html.includes('id="site-menu"'), file);
   }
 });
+
+test('the language switch links each page to its counterpart and marks the current one', async () => {
+  const ro = await read('ro/index.html');
+  assert.match(ro, /<a href="\/" hreflang="en" lang="en" data-lang-link="en" aria-current="false">EN<\/a>/);
+  assert.match(ro, /<a href="\/ro\/" hreflang="ro" lang="ro" data-lang-link="ro" aria-current="true">RO<\/a>/);
+});
+
+test('the first-visit redirect script is inlined only on the English home page', async () => {
+  assert.ok((await read('index.html')).includes('data-lang-redirect'));
+  assert.ok(!(await read('ro/index.html')).includes('data-lang-redirect'));
+});
