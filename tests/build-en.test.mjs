@@ -31,9 +31,9 @@ test('pages carry no language switch, no hreflang and no language redirect', asy
   }
 });
 
-test('the sitemap lists the seven English pages without language alternates', async () => {
+test('the sitemap lists the six English pages without language alternates', async () => {
   const xml = await read('sitemap.xml');
-  assert.equal(xml.match(/<url>/g).length, 7);
+  assert.equal(xml.match(/<url>/g).length, 6);
   assert.ok(!xml.includes('<xhtml:link'));
   assert.ok(!xml.includes('/ro/'));
 });

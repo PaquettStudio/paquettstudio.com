@@ -17,28 +17,20 @@ before(async () => {
   await build({ root, outDir: out });
 });
 
-test('the play page exists with the game layout', async () => {
+// Abyss Angler Idle is paused while its fishing is fixed; reverting the pause commit restores the game tests.
+test('while paused, /play/ explains the break, points to the full game and stays out of search', async () => {
   const html = await read('play/index.html');
-  assert.match(html, /<body class="page-play">/);
-  for (const hook of ['data-canvas', 'data-cast', 'aria-live', 'data-panel="upgrades"', 'data-panel="collection"', 'data-panel="full-game"', 'data-tabs']) {
-    assert.ok(html.includes(hook), hook);
-  }
-  assert.ok(html.includes('<script type="module" src="/assets/js/play/main.js"></script>'));
-});
-
-test('the full-game panel links to the official store listings', async () => {
-  const html = await read('play/index.html');
+  assert.ok(html.includes('taking a short break'));
+  assert.ok(!html.includes('/assets/js/play/main.js'));
+  assert.ok(html.includes('<meta name="robots" content="noindex">'));
   assert.ok(html.includes(`href="${site.games.abyssAngler.appStore}"`));
   assert.ok(html.includes(`href="${site.games.abyssAngler.googlePlay}"`));
-  assert.ok(html.includes('The deep goes on — 245+ more species, sharks that bite back, a boat worth building.'));
 });
 
-test('the site links to the game: menu and the Abyss Angler page', async () => {
-  assert.ok((await read('index.html')).includes('href="/play/"'));
-  const game = await read('games/abyss-angler/index.html');
-  assert.ok(game.includes('href="/play/"'));
-  assert.ok(game.includes('Play the idle edition'));
-  assert.ok(!game.includes('coming soon'));
+test('while paused, nothing on the site links to /play/', async () => {
+  for (const file of ['index.html', 'games/abyss-angler/index.html', 'legal/privacy/index.html']) {
+    assert.ok(!(await read(file)).includes('href="/play/"'), file);
+  }
 });
 
 test('the privacy policy mentions the game progress saved in the browser', async () => {

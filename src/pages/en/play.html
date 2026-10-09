@@ -1,41 +1,12 @@
-<!--page {"id":"play","path":"/play/","layout":"play","title":"Play Abyss Angler Idle | Paquett Studio","description":"Abyss Angler Idle: a small, relaxed fishing game you can play right here in your browser. Drop your line, collect 36 species and let your crew fish while you are away."} -->
-<link rel="stylesheet" href="/assets/css/play.css">
-<section class="play" data-play aria-label="Abyss Angler Idle">
-  <h1 class="visually-hidden">Abyss Angler Idle</h1>
-  <div class="play-hud" data-hud></div>
-  <div class="play-stage" data-stage>
-    <canvas data-canvas role="img" aria-label="The sea below your boat. Steer the lure with your finger, the mouse or the arrow keys; fish bite on the way up."></canvas>
-    <button class="btn btn-primary play-cast" data-cast type="button">Cast</button>
+<!--page {"id":"play","path":"/play/","noindex":true,"title":"Abyss Angler Idle | Paquett Studio","description":"Abyss Angler Idle is taking a short break while we tune it. The full game is on the App Store and Google Play."} -->
+<section class="hero lost" aria-labelledby="play-title">
+  <div class="hero-inner">
+    <p class="kicker">Browser edition</p>
+    <h1 id="play-title">Abyss Angler Idle is taking a short break</h1>
+    <p class="lead hero-lead">We're tuning the fishing. Back soon! Until then, the full game is waiting on your phone.</p>
+    <div class="store-badges">
+      <a href="{{ site.games.abyssAngler.appStore }}"><img src="/assets/img/badges/app-store.svg" alt="Download on the App Store" width="150" height="50"></a>
+      <a href="{{ site.games.abyssAngler.googlePlay }}"><img class="badge-google" src="/assets/img/badges/google-play-en.png" alt="Get it on Google Play" width="194" height="75"></a>
+    </div>
   </div>
-  <p class="visually-hidden" aria-live="polite" data-live></p>
-
-  <div class="play-panels">
-    <section class="play-panel" id="panel-upgrades" data-panel="upgrades" aria-labelledby="upgrades-title">
-      <header class="play-panel-head"><h2 id="upgrades-title">Upgrades</h2><button class="play-panel-close" type="button" data-close aria-label="Close">×</button></header>
-      <div data-upgrades></div>
-    </section>
-    <section class="play-panel" id="panel-collection" data-panel="collection" aria-labelledby="collection-title">
-      <header class="play-panel-head"><h2 id="collection-title">Collection</h2><button class="play-panel-close" type="button" data-close aria-label="Close">×</button></header>
-      <div data-collection></div>
-      <div class="play-settings" data-settings></div>
-    </section>
-    <section class="play-panel" id="panel-full-game" data-panel="full-game" aria-labelledby="full-game-title">
-      <header class="play-panel-head"><h2 id="full-game-title">Get the full game</h2><button class="play-panel-close" type="button" data-close aria-label="Close">×</button></header>
-      <img class="play-full-icon" src="/assets/img/abyss/app-icon.webp" alt="" width="72" height="72" loading="lazy">
-      <p class="play-full-text">The deep goes on — 245+ more species, sharks that bite back, a boat worth building.</p>
-      <div class="store-badges">
-        <a href="{{ site.games.abyssAngler.appStore }}"><img src="/assets/img/badges/app-store.svg" alt="Download on the App Store" width="150" height="50" loading="lazy"></a>
-        <a href="{{ site.games.abyssAngler.googlePlay }}"><img class="badge-google" src="/assets/img/badges/google-play-en.png" alt="Get it on Google Play" width="194" height="75" loading="lazy"></a>
-      </div>
-      <p><a href="{{ links.game }}">More about Abyss Angler™</a></p>
-    </section>
-  </div>
-
-  <nav class="play-tabs" data-tabs aria-label="Game panels">
-    <button type="button" data-tab="upgrades" aria-controls="panel-upgrades" aria-selected="false">Upgrades</button>
-    <button type="button" data-tab="collection" aria-controls="panel-collection" aria-selected="false">Collection</button>
-    <button type="button" data-tab="full-game" aria-controls="panel-full-game" aria-selected="false">Full game</button>
-  </nav>
-  <noscript><p class="play-noscript">Abyss Angler Idle needs JavaScript. You can still get the full game on the App Store or Google Play.</p></noscript>
 </section>
-<script type="module" src="/assets/js/play/main.js"></script>
