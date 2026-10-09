@@ -72,3 +72,9 @@ test('a prompt shows at most once per session, even with blocked storage', () =>
   assert.equal(onceThisSession(blocked, 'complete'), true);
   assert.equal(onceThisSession(blocked, 'complete'), false);
 });
+
+test('tiny fish are weighed in grams instead of 0.0 kg', () => {
+  assert.equal(caughtText({ name: 'Spotted Lanternfish' }, 0.012), 'Caught Spotted Lanternfish, 12 g');
+  assert.equal(caughtText({ name: 'Spotted Lanternfish' }, 0.0004), 'Caught Spotted Lanternfish, 1 g');
+  assert.equal(caughtText({ name: 'Salema' }, 0.1), 'Caught Salema, 0.1 kg');
+});

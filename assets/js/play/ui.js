@@ -25,7 +25,8 @@ const CTA_HEADINGS = {
 };
 
 const fmt = n => Math.round(n).toLocaleString('en-GB');
-const kg = w => `${w.toFixed(1)} kg`;
+// Tiny fish read better in grams than as 0.0 kg.
+const kg = w => (w < 0.1 ? `${Math.max(1, Math.round(w * 1000))} g` : `${w.toFixed(1)} kg`);
 
 function effectOf(id, d) {
   switch (id) {
