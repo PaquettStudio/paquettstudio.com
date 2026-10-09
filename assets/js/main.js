@@ -43,7 +43,8 @@ document.addEventListener('click', e => {
 
 const bg = document.getElementById('fx-bg');
 const top = document.getElementById('fx-top');
-if (bg?.getContext && top?.getContext) {
+// The idle game page has its own canvas; the site's aurora and comet would only compete with it.
+if (bg?.getContext && top?.getContext && !document.body.classList.contains('page-play')) {
   const reducedMotion =
     window.matchMedia('(prefers-reduced-motion: reduce)').matches ||
     new URLSearchParams(location.search).has('reduced-motion');

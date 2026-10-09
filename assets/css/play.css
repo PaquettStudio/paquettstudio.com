@@ -1,0 +1,2 @@
+/* Abyss Angler Idle — layout (filled in by the rendering and UI tasks) */
+.page-play main { padding-top: calc(var(--header-h) + env(safe-area-inset-top)); }

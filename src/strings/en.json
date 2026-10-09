@@ -6,6 +6,7 @@
     "games": "Games",
     "studio": "Studio",
     "contact": "Contact",
+    "play": "Play",
     "language": "Language"
   },
   "menu": { "open": "Open menu", "close": "Close menu" },

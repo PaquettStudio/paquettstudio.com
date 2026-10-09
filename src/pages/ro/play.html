@@ -1,0 +1,41 @@
+<!--page {"id":"play","path":"/play/","layout":"play","title":"Joacă Abyss Angler Idle | Paquett Studio","description":"Abyss Angler Idle: un joc de pescuit mic și relaxat, pe care îl joci direct în browser. Aruncă undița, colecționează 36 de specii și lasă echipajul să pescuiască cât lipsești."} -->
+<link rel="stylesheet" href="/assets/css/play.css">
+<section class="play" data-play aria-label="Abyss Angler Idle">
+  <h1 class="visually-hidden">Abyss Angler Idle</h1>
+  <div class="play-hud" data-hud></div>
+  <div class="play-stage" data-stage>
+    <canvas data-canvas role="img" aria-label="Marea de sub barca ta. Ghidează năluca cu degetul, mouse-ul sau săgețile; peștii mușcă la urcare."></canvas>
+    <button class="btn btn-primary play-cast" data-cast type="button">Cast</button>
+  </div>
+  <p class="visually-hidden" aria-live="polite" data-live></p>
+
+  <div class="play-panels">
+    <section class="play-panel" id="panel-upgrades" data-panel="upgrades" aria-labelledby="upgrades-title">
+      <header class="play-panel-head"><h2 id="upgrades-title">Upgrade-uri</h2><button class="play-panel-close" type="button" data-close aria-label="Închide">×</button></header>
+      <div data-upgrades></div>
+    </section>
+    <section class="play-panel" id="panel-collection" data-panel="collection" aria-labelledby="collection-title">
+      <header class="play-panel-head"><h2 id="collection-title">Colecție</h2><button class="play-panel-close" type="button" data-close aria-label="Închide">×</button></header>
+      <div data-collection></div>
+      <div class="play-settings" data-settings></div>
+    </section>
+    <section class="play-panel" id="panel-full-game" data-panel="full-game" aria-labelledby="full-game-title">
+      <header class="play-panel-head"><h2 id="full-game-title">Jocul complet</h2><button class="play-panel-close" type="button" data-close aria-label="Închide">×</button></header>
+      <img class="play-full-icon" src="/assets/img/abyss/app-icon.webp" alt="" width="72" height="72" loading="lazy">
+      <p class="play-full-text">The deep goes on — 245+ more species, sharks that bite back, a boat worth building.</p>
+      <div class="store-badges">
+        <a href="{{ site.games.abyssAngler.appStore }}"><img src="/assets/img/badges/app-store.svg" alt="Descarcă din App Store" width="150" height="50" loading="lazy"></a>
+        <a href="{{ site.games.abyssAngler.googlePlay }}"><img class="badge-google" src="/assets/img/badges/google-play-ro.png" alt="Descarcă de pe Google Play" width="194" height="75" loading="lazy"></a>
+      </div>
+      <p><a href="{{ links.game }}">Mai multe despre Abyss Angler™</a></p>
+    </section>
+  </div>
+
+  <nav class="play-tabs" data-tabs aria-label="Panourile jocului">
+    <button type="button" data-tab="upgrades" aria-controls="panel-upgrades" aria-selected="false">Upgrade-uri</button>
+    <button type="button" data-tab="collection" aria-controls="panel-collection" aria-selected="false">Colecție</button>
+    <button type="button" data-tab="full-game" aria-controls="panel-full-game" aria-selected="false">Jocul complet</button>
+  </nav>
+  <noscript><p class="play-noscript">Abyss Angler Idle are nevoie de JavaScript. Poți lua oricând jocul complet din App Store sau Google Play.</p></noscript>
+</section>
+<script type="module" src="/assets/js/play/main.js"></script>

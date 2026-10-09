@@ -15,6 +15,7 @@ const ROUTES = {
   privacy: '/legal/privacy/',
   copyright: '/legal/copyright/',
   report: '/report/',
+  play: '/play/',
 };
 
 const readJson = async path => JSON.parse(await readFile(path, 'utf8'));

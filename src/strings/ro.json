@@ -6,6 +6,7 @@
     "games": "Jocuri",
     "studio": "Studio",
     "contact": "Contact",
+    "play": "Joacă",
     "language": "Limbă"
   },
   "menu": { "open": "Deschide meniul", "close": "Închide meniul" },

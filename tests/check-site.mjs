@@ -3,7 +3,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { join, relative, sep, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
-const PAGE_PATHS = ['/', '/games/abyss-angler/', '/legal/terms/', '/legal/privacy/', '/legal/copyright/', '/report/'];
+const PAGE_PATHS = ['/', '/games/abyss-angler/', '/legal/terms/', '/legal/privacy/', '/legal/copyright/', '/report/', '/play/'];
 const ENGLISH_ONLY = [{ code: 'en', prefix: '' }];
 
 export function expectedPaths(languages) {
