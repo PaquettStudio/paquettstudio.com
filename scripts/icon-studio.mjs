@@ -5,14 +5,33 @@
 //   open http://localhost:4174/          → icons + OG image
 //   open http://localhost:4174/images    → game images (needs --src)
 import { createServer } from 'node:http';
-import { readFile, writeFile } from 'node:fs/promises';
+import { readFile, writeFile, mkdir } from 'node:fs/promises';
 import { join, dirname, resolve, sep, extname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const assets = resolve(root, 'assets');
-const srcFlag = process.argv.indexOf('--src');
-const gameRoot = srcFlag > 0 ? resolve(process.argv[srcFlag + 1]) : null;
+const arg = name => { const i = process.argv.indexOf(name); return i > 0 ? resolve(process.argv[i + 1]) : null; };
+const gameRoot = arg('--src');
+// Unity Assets folder (read only) for the idle game's art: open http://localhost:4174/play-art
+const unityAssets = arg('--assets');
+const playSpecies = JSON.parse(await readFile(join(assets, 'data/fish.json'), 'utf8').catch(() => '{"species":[]}')).species;
+const PLAY_EXTRAS = {
+  'vessel-0': 'Resources/Icons/Vessel/life_ring_m.png',
+  'vessel-1': 'Resources/Icons/Vessel/rowboat_m.png',
+  'vessel-2': 'Resources/Icons/Vessel/fishing_boat_m.png',
+  lure: 'Resources/Special/lure_1.png',
+  shark: 'Resources/Special/shark_hunter.png',
+};
+const playSource = key => {
+  if (PLAY_EXTRAS[key]) return PLAY_EXTRAS[key];
+  const fish = playSpecies.find(s => `fish/${s.id}` === key);
+  return fish ? `Resources/FishArt/${fish.name}.png` : null;
+};
+const playOutput = name => {
+  const key = name.replace(/\.webp$/, '');
+  return name.endsWith('.webp') && playSource(key) ? `play/${key}.webp` : null;
+};
 
 // Output name → path inside assets/img. Anything else is refused.
 const OUTPUTS = {
@@ -42,19 +61,32 @@ createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
   try {
     if (req.method === 'POST' && url.pathname === '/save') {
-      const out = OUTPUTS[url.searchParams.get('name')];
+      const name = url.searchParams.get('name');
+      const out = OUTPUTS[name] ?? playOutput(name);
       if (!out) { res.writeHead(400); return res.end('unknown output'); }
       const chunks = [];
       for await (const chunk of req) chunks.push(chunk);
+      await mkdir(dirname(join(assets, 'img', out)), { recursive: true });
       await writeFile(join(assets, 'img', out), Buffer.concat(chunks));
       console.log(`saved assets/img/${out}`);
       res.writeHead(204);
       return res.end();
     }
-    if (url.pathname === '/' || url.pathname === '/images') {
-      const page = url.pathname === '/' ? 'render-icons.html' : 'render-images.html';
+    const pages = { '/': 'render-icons.html', '/images': 'render-images.html', '/play-art': 'render-play-art.html' };
+    if (pages[url.pathname]) {
       res.writeHead(200, { 'content-type': TYPES['.html'] });
-      return res.end(await readFile(join(root, 'scripts', page)));
+      return res.end(await readFile(join(root, 'scripts', pages[url.pathname])));
+    }
+    if (url.pathname === '/play-list') {
+      const items = [...Object.keys(PLAY_EXTRAS), ...playSpecies.map(s => `fish/${s.id}`)];
+      res.writeHead(200, { 'content-type': 'application/json' });
+      return res.end(JSON.stringify(items));
+    }
+    if (url.pathname.startsWith('/play-src/')) {
+      const rel = playSource(decodeURIComponent(url.pathname.slice('/play-src/'.length)));
+      if (!rel || !unityAssets) { res.writeHead(404); return res.end(); }
+      res.writeHead(200, { 'content-type': TYPES['.png'] });
+      return res.end(await readFile(join(unityAssets, rel)));
     }
     if (url.pathname.startsWith('/src/')) {
       const rel = SOURCES[url.pathname.slice(5)];

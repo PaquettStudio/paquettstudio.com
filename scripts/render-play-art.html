@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Play art studio</title>
+<style>
+  body { margin: 0; padding: 24px; background: #222; color: #eee; font: 14px system-ui; }
+  #out { display: flex; flex-wrap: wrap; gap: 8px; }
+  canvas { background: repeating-conic-gradient(#333 0 25%, #2a2a2a 0 50%) 0 0 / 16px 16px; max-height: 96px; width: auto; }
+</style>
+</head>
+<body>
+<p id="status">rendering…</p>
+<div id="out"></div>
+<script>
+// Longest side per kind; everything is trimmed to its visible pixels first.
+const MAX = { fish: 256, vessel: 320, lure: 96, shark: 320 };
+const kindOf = key => key.startsWith('fish/') ? 'fish' : key.startsWith('vessel') ? 'vessel' : key;
+
+const load = key => new Promise((ok, fail) => {
+  const img = new Image();
+  img.onload = () => ok(img);
+  img.onerror = () => fail(new Error('cannot load ' + key));
+  img.src = '/play-src/' + encodeURIComponent(key);
+});
+
+function trimmed(img, maxSide) {
+  const src = document.createElement('canvas');
+  src.width = img.naturalWidth; src.height = img.naturalHeight;
+  const sctx = src.getContext('2d');
+  sctx.drawImage(img, 0, 0);
+  const { data, width, height } = sctx.getImageData(0, 0, src.width, src.height);
+  let x0 = width, y0 = height, x1 = -1, y1 = -1;
+  for (let y = 0; y < height; y++) for (let x = 0; x < width; x++) {
+    if (data[(y * width + x) * 4 + 3] > 8) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  }
+  if (x1 < 0) throw new Error('empty image');
+  const w = x1 - x0 + 1, h = y1 - y0 + 1, scale = Math.min(1, maxSide / Math.max(w, h));
+  const out = document.createElement('canvas');
+  out.width = Math.max(1, Math.round(w * scale)); out.height = Math.max(1, Math.round(h * scale));
+  const octx = out.getContext('2d');
+  octx.imageSmoothingQuality = 'high';
+  octx.drawImage(src, x0, y0, w, h, 0, 0, out.width, out.height);
+  return out;
+}
+
+(async () => {
+  const items = await (await fetch('/play-list')).json();
+  let total = 0;
+  for (const key of items) {
+    const canvas = trimmed(await load(key), MAX[kindOf(key)]);
+    document.getElementById('out').append(canvas);
+    const blob = await new Promise(r => canvas.toBlob(r, 'image/webp', 0.85));
+    const res = await fetch('/save?name=' + encodeURIComponent(key + '.webp'), { method: 'POST', body: blob });
+    if (!res.ok) throw new Error(key + ': ' + res.status);
+    total += blob.size;
+  }
+  document.getElementById('status').textContent = `done: ${items.length} files, ${Math.round(total / 1024)} KB`;
+})().catch(e => { document.getElementById('status').textContent = 'error: ' + e.message; });
+</script>
+</body>
+</html>
