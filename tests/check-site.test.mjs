@@ -3,7 +3,11 @@ import assert from 'node:assert/strict';
 import { mkdtemp, mkdir, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { checkSite, EXPECTED_PATHS } from './check-site.mjs';
+import { checkSite as check, expectedPaths } from './check-site.mjs';
+
+const BILINGUAL = [{ code: 'en', prefix: '' }, { code: 'ro', prefix: '/ro' }];
+const EXPECTED_PATHS = expectedPaths(BILINGUAL);
+const checkSite = (dir, opts) => check(dir, { languages: BILINGUAL, ...opts });
 
 const BASE = 'https://paquettstudio.com';
 const FOOTER = '<footer>© 2026 Paquett Studio Ltd · Company No. 123 · Registered office: 1 Street</footer>';
@@ -131,4 +135,12 @@ test('links still waiting for real data are left to the strict marker check', as
   const dir = await writeFixture(files);
   assert.deepEqual(await checkSite(dir, { strict: false }), []);
   assert.deepEqual(await checkSite(dir, { strict: true }), ['Unfinished marker [[DE COMPLETAT]] in index.html']);
+});
+
+test('a single-language site needs no hreflang and no /ro/ pages', async () => {
+  const files = {};
+  for (const url of expectedPaths([{ code: 'en', prefix: '' }])) {
+    files[fileFor(url)] = page(url).replace(/<link rel="alternate"[^>]*>/g, '');
+  }
+  assert.deepEqual(await check(await writeFixture(files), { strict: true, languages: [{ code: 'en', prefix: '' }] }), []);
 });

@@ -1,5 +1,6 @@
 {
   "baseUrl": "https://paquettstudio.com",
+  "enabledLanguages": ["en"],
   "languages": [
     { "code": "en", "label": "EN", "name": "English", "prefix": "" },
     { "code": "ro", "label": "RO", "name": "Română", "prefix": "/ro" }

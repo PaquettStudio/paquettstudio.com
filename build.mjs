@@ -20,7 +20,7 @@ const ROUTES = {
 const readJson = async path => JSON.parse(await readFile(path, 'utf8'));
 
 function alternatesHtml(page, pages, site) {
-  if (page.meta.single) return '';
+  if (page.meta.single || site.languages.length < 2) return '';
   const links = site.languages
     .filter(lang => pages.some(p => p.meta.id === page.meta.id && p.lang.code === lang.code))
     .map(lang => `<link rel="alternate" hreflang="${lang.code}" href="${site.baseUrl}${urlFor(lang.prefix, page.meta.path)}">`);
@@ -29,6 +29,7 @@ function alternatesHtml(page, pages, site) {
 }
 
 function langSwitchHtml(page, pages, site, t) {
+  if (site.languages.length < 2) return '';
   const items = site.languages.map(lang => {
     const target = pages.find(p => p.meta.id === page.meta.id && p.lang.code === lang.code);
     const href = urlFor(lang.prefix, target && !page.meta.single ? target.meta.path : '/');
@@ -39,7 +40,7 @@ function langSwitchHtml(page, pages, site, t) {
 }
 
 function headExtraHtml(page, site, partials) {
-  const isDefaultHome = page.meta.id === 'home' && page.lang.code === site.languages[0].code;
+  const isDefaultHome = site.languages.length > 1 && page.meta.id === 'home' && page.lang.code === site.languages[0].code;
   return isDefaultHome ? `<script data-lang-redirect>${partials.langRedirect.trim()}</script>` : '';
 }
 
@@ -129,10 +130,13 @@ function assertSafeOutDir(root, outDir) {
   }
 }
 
-export async function build({ root = process.cwd(), outDir } = {}) {
+// `languages` (codes) overrides site.json's enabledLanguages, e.g. to build a dormant translation.
+export async function build({ root = process.cwd(), outDir, languages } = {}) {
   outDir = outDir ?? join(root, 'site');
   assertSafeOutDir(root, outDir);
-  const site = await readJson(join(root, 'src/data/site.json'));
+  const config = await readJson(join(root, 'src/data/site.json'));
+  const enabled = languages ?? config.enabledLanguages ?? config.languages.map(l => l.code);
+  const site = { ...config, languages: config.languages.filter(l => enabled.includes(l.code)) };
   const layout = await readFile(join(root, 'src/layout.html'), 'utf8');
   const strings = {};
   for (const lang of site.languages) strings[lang.code] = await readJson(join(root, `src/strings/${lang.code}.json`));

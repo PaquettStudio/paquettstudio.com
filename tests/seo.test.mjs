@@ -36,3 +36,10 @@ test('the sitemap is a valid urlset document', () => {
   assert.ok(xml.includes('xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"'));
   assert.ok(xml.includes('xmlns:xhtml="http://www.w3.org/1999/xhtml"'));
 });
+
+test('a single-language sitemap has no alternate links', () => {
+  const en = { ...site, languages: [site.languages[0]] };
+  const xml = sitemapXml(pages.filter(p => p.lang.code === 'en'), en);
+  assert.equal(xml.match(/<url>/g).length, 6);
+  assert.ok(!xml.includes('<xhtml:link'));
+});

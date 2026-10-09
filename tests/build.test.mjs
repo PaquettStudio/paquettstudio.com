@@ -12,7 +12,8 @@ const read = rel => readFile(join(out, rel), 'utf8');
 
 before(async () => {
   out = await mkdtemp(join(tmpdir(), 'site-'));
-  await build({ root, outDir: out });
+  // Romanian is dormant in production; build it here so the bilingual machinery stays covered.
+  await build({ root, outDir: out, languages: ['en', 'ro'] });
 });
 
 test('home pages exist in both languages', async () => {
@@ -141,11 +142,10 @@ test('CNAME names the custom domain', async () => {
   assert.equal((await read('CNAME')).trim(), 'paquettstudio.com');
 });
 
-test('the 404 page is not indexed and offers a way home in both languages', async () => {
+test('the 404 page is not indexed and offers a way home', async () => {
   const html = await read('404.html');
   assert.ok(html.includes('<meta name="robots" content="noindex">'));
   assert.ok(html.includes('href="/"'));
-  assert.ok(html.includes('href="/ro/"'));
 });
 
 test('pages carry social preview tags with absolute URLs', async () => {

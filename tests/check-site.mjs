@@ -4,7 +4,11 @@ import { join, relative, sep, resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 
 const PAGE_PATHS = ['/', '/games/abyss-angler/', '/legal/terms/', '/legal/privacy/', '/legal/copyright/', '/report/'];
-export const EXPECTED_PATHS = [...['', '/ro'].flatMap(prefix => PAGE_PATHS.map(p => prefix + p)), '/404.html'];
+const ENGLISH_ONLY = [{ code: 'en', prefix: '' }];
+
+export function expectedPaths(languages) {
+  return [...languages.flatMap(lang => PAGE_PATHS.map(p => lang.prefix + p)), '/404.html'];
+}
 
 const MARKER = '[[DE COMPLETAT]]';
 const TEXT_EXT = /\.(html|css|js|mjs|json|xml|txt|svg)$/;
@@ -35,11 +39,11 @@ function exists(files, urlPath) {
   return files.has(rel) || files.has(`${rel}/index.html`);
 }
 
-function checkHtml(rel, html, files, errors) {
+function checkHtml(rel, html, files, errors, languages) {
   if (!/<title>[^<]*\S[^<]*<\/title>/.test(html)) errors.push(`Missing <title> in ${rel}`);
   if (!/<meta\s+name="description"\s+content="[^"]+"/.test(html)) errors.push(`Missing meta description in ${rel}`);
-  if (rel !== '404.html') {
-    for (const code of ['en', 'ro', 'x-default']) {
+  if (rel !== '404.html' && languages.length > 1) {
+    for (const code of [...languages.map(l => l.code), 'x-default']) {
       if (!html.includes(`hreflang="${code}"`)) errors.push(`Missing hreflang ${code} in ${rel}`);
     }
   }
@@ -74,16 +78,16 @@ function checkCss(rel, css, errors) {
   }
 }
 
-export async function checkSite(dir, { strict }) {
+export async function checkSite(dir, { strict, languages = ENGLISH_ONLY }) {
   const list = await walk(dir);
   const files = new Set(list);
   const errors = [];
-  for (const url of EXPECTED_PATHS) {
+  for (const url of expectedPaths(languages)) {
     if (!files.has(fileFor(url))) errors.push(`Missing page: ${url}`);
   }
   for (const rel of list.filter(f => TEXT_EXT.test(f))) {
     const text = await readFile(join(dir, rel), 'utf8');
-    if (rel.endsWith('.html')) checkHtml(rel, text, files, errors);
+    if (rel.endsWith('.html')) checkHtml(rel, text, files, errors, languages);
     if (rel.endsWith('.css')) checkCss(rel, text, errors);
     if (strict && text.includes(MARKER)) errors.push(`Unfinished marker ${MARKER} in ${rel}`);
   }
@@ -92,7 +96,10 @@ export async function checkSite(dir, { strict }) {
 
 if (process.argv[1] && import.meta.url === pathToFileURL(resolve(process.argv[1])).href) {
   const dir = process.argv[2] ?? 'site';
-  const errors = await checkSite(dir, { strict: process.argv.includes('--strict') });
+  const site = JSON.parse(await readFile(new URL('../src/data/site.json', import.meta.url), 'utf8'));
+  const enabled = site.enabledLanguages ?? site.languages.map(l => l.code);
+  const languages = site.languages.filter(l => enabled.includes(l.code));
+  const errors = await checkSite(dir, { strict: process.argv.includes('--strict'), languages });
   for (const e of errors) console.error(e);
   console.log(errors.length ? `${errors.length} problem(s) found` : 'Site check passed');
   process.exitCode = errors.length ? 1 : 0;
