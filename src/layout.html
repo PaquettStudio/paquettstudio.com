@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="{{ lang.code }}">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{ page.title }}</title>
+<meta name="description" content="{{ page.description }}">
+<link rel="canonical" href="{{ site.baseUrl }}{{ url }}">
+{{{ alternatesHtml }}}
+{{{ headExtraHtml }}}
+</head>
+<body>
+<main id="main">
+{{{ noticeHtml }}}
+{{{ content }}}
+</main>
+<footer class="site-footer">
+  <nav class="footer-links" aria-label="{{ t.footer.legalNav }}">
+    <a href="{{ links.terms }}">{{ t.footer.terms }}</a>
+    <a href="{{ links.privacy }}">{{ t.footer.privacy }}</a>
+    <a href="{{ links.copyright }}">{{ t.footer.copyright }}</a>
+    <a href="{{ links.report }}">{{ t.footer.report }}</a>
+  </nav>
+  <p class="legal-line">© {{ year }} {{ site.company.legalName }} · Registered in {{ site.company.jurisdiction }} · Company No. {{ site.company.number }} · Registered office: {{ site.company.office }}</p>
+</footer>
+{{{ jsonLdHtml }}}
+</body>
+</html>

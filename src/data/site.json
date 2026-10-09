@@ -1,0 +1,25 @@
+{
+  "baseUrl": "https://paquettstudio.com",
+  "languages": [
+    { "code": "en", "label": "EN", "name": "English", "prefix": "" },
+    { "code": "ro", "label": "RO", "name": "Română", "prefix": "/ro" }
+  ],
+  "company": {
+    "legalName": "Paquett Studio Ltd",
+    "number": "[[DE COMPLETAT]]",
+    "jurisdiction": "[[DE COMPLETAT]]",
+    "office": "[[DE COMPLETAT]]",
+    "emailContact": "[[DE COMPLETAT]]",
+    "emailLegal": "[[DE COMPLETAT]]"
+  },
+  "games": {
+    "abyssAngler": {
+      "name": "Abyss Angler",
+      "appStore": "[[DE COMPLETAT]]",
+      "googlePlay": "[[DE COMPLETAT]]",
+      "releaseIos": "[[DE COMPLETAT]]",
+      "releaseAndroid": "[[DE COMPLETAT]]"
+    }
+  },
+  "social": []
+}

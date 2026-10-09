@@ -1,0 +1,11 @@
+{
+  "name": "paquett-website",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "test": "node --test \"tests/*.test.mjs\"",
+    "check": "node tests/check-site.mjs site --strict",
+    "serve": "node scripts/serve.mjs"
+  }
+}
