@@ -174,3 +174,17 @@ test('reduced motion draws a still frame and never starts the loop', () => {
   assert.equal(fx.isRunning(), false);
   assert.equal(frames, 0);
 });
+
+test('the reduced-motion still frame leaves out the hero grid', () => {
+  const { doc, win } = fakeEnv();
+  doc.querySelector = sel => (sel === '.hero' ? { getBoundingClientRect: () => ({ bottom: 600 }) } : null);
+  const strokes = [];
+  const recording = () => {
+    const ctx = stubContext();
+    return new Proxy(ctx, { set: (t, k, v) => { if (k === 'strokeStyle') strokes.push(v); t[k] = v; return true; } });
+  };
+  const bg = { width: 0, height: 0, style: {}, getContext: recording };
+  const input = createInput(new EventTarget(), () => 0);
+  startFx({ doc, win, bg, top: stubCanvas(), input, reducedMotion: true, raf: () => 1, caf: () => {} });
+  assert.ok(!strokes.includes('rgba(160,140,255,0.16)'), 'grid was drawn');
+});

@@ -12,6 +12,7 @@
       <li><a href="#website">This website</a></li>
       <li><a href="#email">When you email us</a></li>
       <li><a href="#games">Our games</a></li>
+      <li><a href="#bases">Legal bases</a></li>
       <li><a href="#sharing">Who we share data with</a></li>
       <li><a href="#transfers">International transfers</a></li>
       <li><a href="#retention">How long we keep data</a></li>
@@ -23,51 +24,67 @@
   </details>
   <div class="prose">
     <h2 id="controller">1. Who is responsible for your data</h2>
-    <p><strong>{{ site.company.legalName }}</strong> is the controller of the personal data described in this policy. Registered office: {{ site.company.office }}. Contact: <a href="mailto:{{ site.company.emailLegal }}">{{ site.company.emailLegal }}</a>.</p>
-    <p>We handle personal data in line with the UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018.</p>
+    <p><strong>{{ site.company.legalName }}</strong> is the controller of the personal data described in this policy, including data processed through our games. Registered office: {{ site.company.office }}. Contact: <a href="mailto:{{ site.company.emailLegal }}">{{ site.company.emailLegal }}</a>.</p>
+    <p>We handle personal data in line with the UK General Data Protection Regulation (UK GDPR) and the Data Protection Act 2018. Where a game has its own, more detailed privacy policy, that policy applies together with this one.</p>
 
     <h2 id="website">2. This website</h2>
     <ul>
       <li><strong>No cookies, analytics or advertising trackers.</strong> We do not use cookies, analytics tools or third-party trackers on this website, and our fonts are served from our own site.</li>
       <li><strong>Preferences on your device.</strong> If you choose a language or turn sound effects on, that choice is saved in your browser’s local storage so the site remembers it. It stays on your device and is never sent to us.</li>
-      <li><strong>Hosting.</strong> This website is hosted by GitHub Pages (GitHub, Inc.). To deliver the pages and keep the service secure, GitHub processes technical data such as your IP address. See GitHub’s privacy statement for details.</li>
+      <li><strong>Hosting.</strong> This website is hosted by GitHub Pages (GitHub, Inc.). To deliver the pages and keep the service secure, GitHub processes technical data such as your IP address, under GitHub’s own privacy statement.</li>
     </ul>
 
     <h2 id="email">3. When you email us</h2>
-    <p>If you write to us, we receive your email address, your name if you include it, and whatever you choose to tell us. We use this only to reply and to keep a record of the conversation. Our legal basis is our legitimate interest in answering messages and running our business. Our email is provided by Google Workspace, which processes it on our behalf.</p>
+    <p>If you write to us, we receive your email address, your name if you include it, and whatever you choose to tell us. We use this only to reply and to keep a record of the conversation. Our email is provided by Google Workspace, which processes it on our behalf.</p>
 
     <h2 id="games">4. Our games</h2>
-    <p><strong>Abyss Angler™</strong> has its own detailed privacy policy, which explains exactly what the game does with information and applies to the game: <a href="{{ site.games.abyssAngler.privacyPolicy }}">Abyss Angler privacy policy</a>. In short:</p>
+    <p><strong>Abyss Angler™</strong> has its own, more detailed privacy policy, which explains exactly what the game does with information: <a href="{{ site.games.abyssAngler.privacyPolicy }}">Abyss Angler privacy policy</a>. In short:</p>
     <ul>
       <li>The game never asks for your email address, phone number, location or contacts.</li>
-      <li>It sends anonymous usage counts (for example “a player reached 500 m”) linked only to a random identifier created on your device. You can switch them off in the game under Settings › Privacy › Usage statistics.</li>
+      <li>It sends usage counts (for example “a player reached 500 m”). They are linked to a random identifier created on your device, not to your name, contact details or account. In versions of the game that include it, you can switch them off under Settings › Privacy › Usage statistics; uninstalling the game always stops them.</li>
       <li>An account is created only if you tap “Keep a copy of my progress”. It holds a random player ID, a friend code, your captain name and portrait and a summary of your play, and you can delete it from inside the game.</li>
       <li>Our game server runs on Cloudflare, acting as our processor. We do not store your IP address; we keep only the two-letter country code of an account.</li>
       <li>Purchases are handled by Apple and Google. We never see your payment details.</li>
-      <li>Optional reward adverts are served by Unity LevelPlay (ironSource). They are personalised only if you say yes when the game asks.</li>
+      <li>Optional reward adverts are served by Unity LevelPlay (ironSource) and the ad networks it works with. To deliver and measure adverts and to prevent fraud, they receive technical information such as your IP address, device model and, where available, an advertising identifier, even when adverts are not personalised. Adverts are personalised only if you say yes when the game asks.</li>
       <li>The game is not directed at children under 13.</li>
     </ul>
     <p>When you download our games, Apple or Google process your download and purchase data under their own privacy policies, as independent controllers.</p>
 
-    <h2 id="sharing">5. Who we share data with</h2>
-    <p>We do not sell personal data. We share it only with service providers who process it for us (Google Workspace for email, GitHub for website hosting and Cloudflare for our game server), with app stores and our advertising partner as described above, and where the law requires us to.</p>
+    <h2 id="bases">5. Legal bases</h2>
+    <p>Under UK GDPR we rely on these legal bases:</p>
+    <ul>
+      <li><strong>Legitimate interests</strong> — delivering and securing this website, replying to your emails, understanding and improving our games through usage counts (you can object, including by switching the counts off), and showing non-personalised adverts that keep our games free.</li>
+      <li><strong>Contract</strong> — providing the optional game account and progress backup you ask for, and in-game purchases (processed by Apple and Google).</li>
+      <li><strong>Consent</strong> — personalised adverts. You can withdraw consent at any time in the game’s settings.</li>
+      <li><strong>Legal obligation</strong> — where the law requires us to keep or disclose information.</li>
+    </ul>
 
-    <h2 id="transfers">6. International transfers</h2>
-    <p>Some of our providers may process data outside the UK, including in the United States and the European Union. When that happens, the transfer is protected by safeguards recognised under UK law, such as the UK–US data bridge or standard contractual clauses with the UK addendum.</p>
+    <h2 id="sharing">6. Who we share data with</h2>
+    <p>We do not sell personal data. We share it only with:</p>
+    <ul>
+      <li>service providers that process it on our behalf: Google Workspace (email) and Cloudflare (our game server);</li>
+      <li>GitHub, which hosts this website and handles connection data as described in section 2;</li>
+      <li>Apple and Google, for downloads and purchases;</li>
+      <li>our advertising partner and the ad networks it works with, as described in section 4;</li>
+      <li>authorities, where the law requires it.</li>
+    </ul>
 
-    <h2 id="retention">7. How long we keep data</h2>
-    <p>We keep emails for up to 24 months after our conversation ends, unless we need them longer to deal with a legal claim or to meet a legal obligation.</p>
+    <h2 id="transfers">7. International transfers</h2>
+    <p>Some of these providers process data outside the UK, including in the United States and the European Union. When that happens, the transfer is protected by safeguards recognised under UK law, such as the UK–US data bridge or standard contractual clauses with the UK addendum.</p>
 
-    <h2 id="rights">8. Your rights</h2>
+    <h2 id="retention">8. How long we keep data</h2>
+    <p>We keep emails for up to 24 months after our conversation ends, unless we need them longer to deal with a legal claim or to meet a legal obligation. Game accounts are kept until you delete them; the game’s own policy explains the details.</p>
+
+    <h2 id="rights">9. Your rights</h2>
     <p>You have the right to ask for access to your personal data, to have it corrected or erased, to restrict or object to how we use it, and to receive it in a portable format. Where we rely on your consent, you can withdraw it at any time. To use any of these rights, email <a href="mailto:{{ site.company.emailLegal }}">{{ site.company.emailLegal }}</a>. We will reply within one month.</p>
 
-    <h2 id="complaints">9. Complaints</h2>
+    <h2 id="complaints">10. Complaints</h2>
     <p>If you are unhappy with how we handle your data, please contact us first so we can try to put it right. You also have the right to complain to the UK Information Commissioner’s Office (ICO) at ico.org.uk or on 0303 123 1113.</p>
 
-    <h2 id="children">10. Children</h2>
+    <h2 id="children">11. Children</h2>
     <p>This website is not directed at children and we do not knowingly collect personal data from children through it.</p>
 
-    <h2 id="changes">11. Changes to this policy</h2>
+    <h2 id="changes">12. Changes to this policy</h2>
     <p>We may update this policy. The date at the top shows when it last changed.</p>
   </div>
 </article>

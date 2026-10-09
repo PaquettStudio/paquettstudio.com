@@ -6,11 +6,12 @@ import { rememberLang } from '../assets/js/i18n.js';
 
 const redirectSource = await readFile(new URL('../src/partials/lang-redirect.js', import.meta.url), 'utf8');
 
-function runRedirect({ path = '/', search = '', hash = '', stored = null, storageThrows = false, languages, language }) {
+function runRedirect({ path = '/', search = '', hash = '', stored = null, storageThrows = false, languages, language, referrer = '' }) {
   const replaced = [];
   const window = {
     navigator: { languages, language },
-    location: { pathname: path, search, hash, replace: url => replaced.push(url) },
+    location: { origin: 'https://paquettstudio.com', pathname: path, search, hash, replace: url => replaced.push(url) },
+    document: { referrer },
   };
   Object.defineProperty(window, 'localStorage', {
     get() {
@@ -63,4 +64,12 @@ test('rememberLang stores the chosen language', () => {
 test('rememberLang never throws when storage is blocked', () => {
   assert.doesNotThrow(() => rememberLang({ setItem() { throw new Error('QuotaExceeded'); } }, 'en'));
   assert.doesNotThrow(() => rememberLang(null, 'en'));
+});
+
+test('arriving from another page of the site never redirects, even with storage blocked', () => {
+  assert.deepEqual(runRedirect({ storageThrows: true, languages: ['ro-RO'], referrer: 'https://paquettstudio.com/ro/' }), []);
+});
+
+test('arriving from another website still follows the browser language', () => {
+  assert.deepEqual(runRedirect({ languages: ['ro-RO'], referrer: 'https://www.google.com/' }), ['/ro/']);
 });

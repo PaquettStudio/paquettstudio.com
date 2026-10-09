@@ -34,7 +34,8 @@ export function startFx({ doc, win, bg, top, input, reducedMotion, raf, caf, onT
     background.resize(w, h);
     particles.resize(w, h);
     particles.setMax(particleBudget(w, h, quality.q));
-    if (reducedMotion) background.draw({ t: 0, dt: 0, scrollV: 0, ...hero() });
+    // The still frame sits on a fixed canvas, so it must not include the hero grid.
+    if (reducedMotion) background.draw({ t: 0, dt: 0, scrollV: 0, heroVisible: false });
   }
 
   function frame(ts) {

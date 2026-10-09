@@ -155,3 +155,13 @@ test('pages carry social preview tags with absolute URLs', async () => {
   assert.ok(html.includes('<meta name="twitter:card" content="summary_large_image">'));
   assert.ok(!html.includes('noindex'));
 });
+
+test('the privacy policy states legal bases and does not overclaim anonymity', async () => {
+  const en = await read('legal/privacy/index.html');
+  const ro = await read('ro/legal/privacy/index.html');
+  assert.match(en, /id="bases"[^>]*>[^<]*Legal bases/);
+  assert.match(ro, /id="bases"[^>]*>[^<]*Temeiurile legale/);
+  assert.ok(!/anonymous/i.test(en), 'EN must not call identifier-linked data anonymous');
+  assert.ok(!/anonim/i.test(ro), 'RO must not call identifier-linked data anonymous');
+  assert.match(en, /ad networks/);
+});

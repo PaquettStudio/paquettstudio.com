@@ -59,7 +59,13 @@ export function createBackground(ctx) {
   function drawGrid(t, heroBottom) {
     const top = heroBottom * 0.7, depth = heroBottom - top;
     if (depth <= 0) return;
-    ctx.strokeStyle = 'rgba(160,140,255,0.16)';
+    // Lines fade out towards the bottom of the hero instead of being covered by an opaque band,
+    // so there is no seam where the hero ends and the aurora continues.
+    const vertical = ctx.createLinearGradient(0, top, 0, heroBottom);
+    vertical.addColorStop(0, 'rgba(160,140,255,0.16)');
+    vertical.addColorStop(0.6, 'rgba(160,140,255,0.16)');
+    vertical.addColorStop(1, 'rgba(160,140,255,0)');
+    ctx.strokeStyle = vertical;
     ctx.lineWidth = 1;
     for (let i = -16; i <= 16; i++) {
       ctx.beginPath();
@@ -67,10 +73,11 @@ export function createBackground(ctx) {
       ctx.lineTo(w * 0.5 + i * w * 0.1, heroBottom);
       ctx.stroke();
     }
+    ctx.strokeStyle = 'rgba(160,140,255,0.16)';
     const off = (t * 0.35) % 1;
     for (let i = 0; i < 12; i++) {
       const z = (i + off) / 12, y = top + depth * z * z;
-      ctx.globalAlpha = z * 0.9;
+      ctx.globalAlpha = z * 0.9 * Math.min(1, (1 - z * z) * 3);
       ctx.beginPath();
       ctx.moveTo(0, y);
       ctx.lineTo(w, y);
@@ -83,11 +90,6 @@ export function createBackground(ctx) {
     fog.addColorStop(1, 'rgba(4,3,8,0)');
     ctx.fillStyle = fog;
     ctx.fillRect(0, top - 30, w, 70);
-    const fade = ctx.createLinearGradient(0, heroBottom - depth * 0.35, 0, heroBottom);
-    fade.addColorStop(0, 'rgba(4,3,8,0)');
-    fade.addColorStop(1, 'rgba(4,3,8,1)');
-    ctx.fillStyle = fade;
-    ctx.fillRect(0, heroBottom - depth * 0.35, w, depth * 0.35 + 1);
   }
 
   function draw({ t, dt, scrollV, heroVisible, heroBottom }) {

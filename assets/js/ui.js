@@ -4,11 +4,14 @@ export function initMenu(doc) {
   const menu = doc.getElementById('site-menu');
   if (!button || !menu) return;
   const root = doc.documentElement;
+  // While the overlay is open, the page behind it must not take focus or clicks.
+  const behind = [doc.getElementById('main'), doc.querySelector('.site-footer')].filter(Boolean);
 
   const setOpen = open => {
     button.setAttribute('aria-expanded', String(open));
     button.setAttribute('aria-label', open ? button.dataset.labelClose : button.dataset.labelOpen);
     root.classList.toggle('menu-open', open);
+    behind.forEach(el => { el.inert = open; });
   };
 
   button.addEventListener('click', () => {
@@ -25,10 +28,13 @@ export function initMenu(doc) {
   menu.addEventListener('click', event => {
     if (event.target.closest('a')) setOpen(false);
   });
+  // Widening past the mobile breakpoint hides the overlay, so close it too.
+  doc.defaultView?.matchMedia?.('(min-width: 860px)').addEventListener?.('change', e => { if (e.matches) setOpen(false); });
 }
 
 // Sections fade up with a light sweep the first time they enter the viewport.
 export function initReveal(doc) {
+  doc.documentElement.classList.add('reveal-ready');
   const items = [...doc.querySelectorAll('.reveal')];
   const win = doc.defaultView;
   if (!('IntersectionObserver' in win)) {

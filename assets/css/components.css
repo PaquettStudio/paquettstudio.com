@@ -7,7 +7,8 @@
   transition: transform 0.2s ease, box-shadow 0.25s ease, background-color 0.25s ease, border-color 0.25s ease;
 }
 .btn:active { transform: scale(0.97); }
-.btn-primary { color: #fff; background: var(--grad-brand); box-shadow: 0 0 26px rgba(255, 63, 164, 0.35); }
+/* Darker brand stops behind white text keep every point of the gradient at WCAG AA (≥ 4.5:1) */
+.btn-primary { color: #fff; background: linear-gradient(90deg, #c01f74, #5b3fe0 55%, #0e7aa8); box-shadow: 0 0 26px rgba(255, 63, 164, 0.35); }
 .btn-primary:hover { color: #fff; box-shadow: 0 0 40px rgba(255, 63, 164, 0.55), 0 0 18px rgba(34, 200, 255, 0.35); transform: translateY(-1px); }
 .btn-ghost {
   color: var(--text); background: var(--glass); border-color: rgba(255, 255, 255, 0.18);
@@ -26,7 +27,7 @@
   color: var(--text-soft); text-decoration: none; font: 600 0.75rem/1 var(--font-body); letter-spacing: 0.12em;
 }
 .lang-switch a:hover { color: #fff; }
-.lang-switch a[aria-current="true"] { color: #fff; background: linear-gradient(90deg, var(--pink), var(--violet)); }
+.lang-switch a[aria-current="true"] { color: #fff; background: linear-gradient(90deg, #c01f74, #5b3fe0); }
 
 /* Brand title: white → lavender */
 .title-brand {
@@ -37,15 +38,16 @@
   -webkit-background-clip: text; background-clip: text; color: transparent;
 }
 
-/* Reveal on scroll (hidden state exists only when JS runs — see tests/css.test.mjs) */
-.js .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s ease var(--d, 0s), transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0s); }
-.js .reveal.is-in { opacity: 1; transform: none; }
+/* Reveal on scroll. The hidden state is armed by initReveal() itself (html.reveal-ready), so content stays
+   visible if JavaScript is off or a module fails to load — see tests/css.test.mjs */
+.reveal-ready .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.8s ease var(--d, 0s), transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) var(--d, 0s); }
+.reveal-ready .reveal.is-in { opacity: 1; transform: none; }
 .sweep::after {
   content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none;
   background: linear-gradient(105deg, transparent 35%, rgba(255, 255, 255, 0.13) 50%, transparent 65%);
   transform: translateX(-120%);
 }
-.js .reveal.is-in .sweep::after { animation: sweep 1.4s ease 0.3s 1 both; }
+.reveal-ready .reveal.is-in .sweep::after { animation: sweep 1.4s ease 0.3s 1 both; }
 @keyframes sweep { to { transform: translateX(120%); } }
 
 /* Panels */
@@ -74,7 +76,7 @@
 /* Glitch: brand title (rare) and "coming next" (on hover / focus / tap) */
 .glitch { position: relative; }
 .glitch::before, .glitch::after {
-  content: attr(data-t); position: absolute; inset: 0; pointer-events: none;
+  content: attr(data-t); content: attr(data-t) / ""; position: absolute; inset: 0; pointer-events: none;
   background: none; -webkit-text-fill-color: currentColor; mix-blend-mode: screen; opacity: 0;
 }
 .glitch::before { color: var(--pink); }
