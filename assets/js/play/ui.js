@@ -9,7 +9,7 @@ const NAMES = {
   reel: 'Reel speed', luck: 'Lucky lure', crew: 'Crew nets', vessel: 'Vessel',
 };
 const HINTS = {
-  line: 'How deep the lure can go. New zones open at 320 m and 1300 m.',
+  line: 'How deep the lure can go. New zones open past 320 m and 1300 m.',
   sink: 'How fast the lure drops.',
   hold: 'How many fish fit in one trip.',
   reach: 'How close a fish must swim to bite.',
@@ -294,7 +294,7 @@ export function createUi(root, { species, zones, speciesById, sessionStore, onBu
         + view.zones.map(z => `
           <section class="play-zone${z.locked ? ' is-locked' : ''}">
             <h3>${esc(z.name)} <span>${z.cards.filter(c => c.known).length}/${z.cards.length}</span></h3>
-            ${z.locked ? `<p class="play-zone-lock">Opens when your line reaches ${z.top} m</p>` : ''}
+            ${z.locked ? `<p class="play-zone-lock">Opens when your line goes past ${z.top} m</p>` : ''}
             <ul class="play-fish-grid">${z.cards.map(c => `
               <li class="play-fish${c.known ? '' : ' is-unknown'}">
                 <img src="/${esc(c.art)}" alt="" width="64" height="40" loading="lazy">
