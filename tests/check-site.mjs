@@ -59,6 +59,7 @@ function checkHtml(rel, html, files, errors) {
   }
   for (const [, url] of html.matchAll(/\b(?:href|src)="([^"]*)"/g)) {
     if (isExternal(url) || /^(mailto:|tel:|data:|javascript:|#)/i.test(url)) continue;
+    if (url.includes(MARKER)) continue; // reported by the strict marker check instead
     const target = internalTarget(rel, url);
     if (target !== null && !exists(files, target)) errors.push(`Broken link in ${rel}: ${url}`);
   }

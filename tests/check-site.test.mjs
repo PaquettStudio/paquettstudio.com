@@ -124,3 +124,11 @@ test('an unfinished marker fails only in strict mode', async () => {
   assert.ok((await checkSite(dir, { strict: true })).includes('Unfinished marker [[DE COMPLETAT]] in index.html'));
   assert.deepEqual(await checkSite(dir, { strict: false }), []);
 });
+
+test('links still waiting for real data are left to the strict marker check', async () => {
+  const files = validSite();
+  files['index.html'] = page('/', { body: '<a href="[[DE COMPLETAT]]">App Store</a>' });
+  const dir = await writeFixture(files);
+  assert.deepEqual(await checkSite(dir, { strict: false }), []);
+  assert.deepEqual(await checkSite(dir, { strict: true }), ['Unfinished marker [[DE COMPLETAT]] in index.html']);
+});

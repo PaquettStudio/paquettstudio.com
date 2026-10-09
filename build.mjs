@@ -39,6 +39,29 @@ function headExtraHtml(page, site, partials) {
   return isDefaultHome ? `<script data-lang-redirect>${partials.langRedirect.trim()}</script>` : '';
 }
 
+// JSON inside <script> must not be able to close the tag.
+const jsonLd = data => `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`;
+
+export function organizationLd(site) {
+  const c = site.company;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'Paquett Studio',
+    legalName: c.legalName,
+    url: site.baseUrl,
+    logo: `${site.baseUrl}/assets/img/icon-512.png`,
+    email: c.emailContact,
+    address: { '@type': 'PostalAddress', streetAddress: c.office },
+  };
+}
+
+function socialHtml(site) {
+  if (!site.social?.length) return '';
+  const items = site.social.map(s => `<li><a href="${escapeHtml(s.url)}" rel="me noopener">${escapeHtml(s.name)}</a></li>`);
+  return `<ul class="social">${items.join('')}</ul>`;
+}
+
 function contextFor(page, pages, site, strings, partials) {
   const { lang, meta } = page;
   const links = Object.fromEntries(Object.entries(ROUTES).map(([k, path]) => [k, urlFor(lang.prefix, path)]));
@@ -53,7 +76,8 @@ function contextFor(page, pages, site, strings, partials) {
     links,
     alternatesHtml: alternatesHtml(page, pages, site),
     langSwitchHtml: langSwitchHtml(page, pages, site, strings[lang.code]),
-    jsonLdHtml: '',
+    jsonLdHtml: jsonLd(organizationLd(site)),
+    socialHtml: socialHtml(site),
     headExtraHtml: headExtraHtml(page, site, partials),
     noticeHtml: '',
   };

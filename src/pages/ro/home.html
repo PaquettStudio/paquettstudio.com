@@ -1,10 +1,83 @@
 <!--page {"id":"home","path":"/","layout":"home","title":"Paquett Studio — Studio independent de jocuri","description":"Paquett Studio Ltd este un studio independent de jocuri care creează lumi în care merită să te pierzi. Creatorii Abyss Angler™."} -->
-<section class="hero">
-  <div>
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero-inner">
     <p class="kicker">Studio independent de jocuri</p>
-    <h1 class="title-brand">PAQUETT STUDIO</h1>
+    <h1 id="hero-title" class="title-brand glitch" data-t="PAQUETT STUDIO">PAQUETT STUDIO</h1>
+    <p class="lead hero-lead">Studio mic. Lumi mari. Jocuri făcute cu obsesie.</p>
+    <div class="btn-row">
+      <a class="btn btn-primary" href="#games">Descoperă jocurile</a>
+      <a class="btn btn-ghost" href="{{ links.game }}">Ia Abyss Angler</a>
+    </div>
+  </div>
+  <a class="scroll-cue" href="#games" aria-label="Derulează la jocurile noastre"><span></span></a>
+</section>
+
+<section class="section" id="games" aria-labelledby="games-title">
+  <header class="section-head reveal">
+    <p class="kicker">Jocurile noastre</p>
+    <h2 id="games-title">Lumile pe care le-am creat</h2>
+  </header>
+  <div class="reveal">
+    <article class="game-card panel sweep" data-tilt>
+      <a class="game-media" href="{{ links.game }}" tabindex="-1" aria-hidden="true">
+        <img src="/assets/img/abyss/key-art.svg" alt="" width="1600" height="900" loading="lazy" decoding="async">
+        <span class="seal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Oficial</span>
+      </a>
+      <div class="game-body">
+        <h3><a href="{{ links.game }}">Abyss Angler™</a></h3>
+        <p>[[DE COMPLETAT]]</p>
+        <ul class="platforms" aria-label="Platforme"><li>iOS</li><li>Android</li></ul>
+        <div class="btn-row start">
+          <a class="btn btn-primary" href="{{ links.game }}">Descoperă jocul</a>
+          <a class="btn btn-ghost" href="{{ site.games.abyssAngler.appStore }}">App Store</a>
+          <a class="btn btn-ghost" href="{{ site.games.abyssAngler.googlePlay }}">Google Play</a>
+        </div>
+      </div>
+    </article>
   </div>
 </section>
-<section class="section" id="games"><h2>Jocuri</h2></section>
-<section class="section" id="studio"><h2>Studio</h2></section>
-<section class="section" id="contact"><h2>Contact</h2></section>
+
+<section class="section" aria-labelledby="next-title">
+  <header class="section-head reveal">
+    <p class="kicker">Urmează</p>
+    <h2 id="next-title">Ceva se mișcă…</h2>
+  </header>
+  <div class="reveal">
+    <article class="next-card panel sweep glitch-on-hover" tabindex="0">
+      <div class="next-silhouette" aria-hidden="true"></div>
+      <h3 class="glitch" data-t="??? — în dezvoltare">??? — în dezvoltare</h3>
+      <p>Următoarea noastră lume prinde contur. Încă fără nume, doar șoapte.</p>
+    </article>
+  </div>
+</section>
+
+<section class="section" id="studio" aria-labelledby="studio-title">
+  <div class="studio-grid">
+    <header class="reveal">
+      <p class="kicker">Studioul</p>
+      <h2 id="studio-title">Echipă mică. Lumi mari.</h2>
+    </header>
+    <div class="reveal" style="--d: 0.1s">
+      <p class="lead">Paquett Studio este un studio independent de jocuri. Facem jocurile pe care ne-am dori și noi să le jucăm: pline de atmosferă, lucrate cu grijă și puțin misterioase.</p>
+      <p>Fiecare lume pe care o lansăm este gândită și șlefuită în studio, până când o simți exact cum trebuie.</p>
+    </div>
+  </div>
+  <ul class="values reveal">
+    <li><strong>Atmosfera înainte de toate</strong><span>Lumi pe care le simți, nu doar le vezi.</span></li>
+    <li><strong>Făcute cu grijă</strong><span>O echipă mică, iar fiecare detaliu e lucrat de mână.</span></li>
+    <li><strong>Independenți</strong><span>Răspundem în fața jucătorilor, nu a editorilor.</span></li>
+  </ul>
+</section>
+
+<section class="section" id="contact" aria-labelledby="contact-title">
+  <div class="reveal">
+    <div class="contact-card panel sweep">
+      <p class="kicker">Contact</p>
+      <h2 id="contact-title">Scrie-ne</h2>
+      <p class="lead">Presă, parteneriate sau un jucător cu ceva de spus — citim tot.</p>
+      <a class="contact-email" href="mailto:{{ site.company.emailContact }}">{{ site.company.emailContact }}</a>
+      {{{ socialHtml }}}
+      <p class="contact-report">Ai găsit o copie a unuia dintre jocurile noastre? <a href="{{ links.report }}">Raporteaz-o aici</a>.</p>
+    </div>
+  </div>
+</section>

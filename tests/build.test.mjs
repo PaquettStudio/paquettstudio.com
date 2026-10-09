@@ -62,3 +62,16 @@ test('the first-visit redirect script is inlined only on the English home page',
   assert.ok((await read('index.html')).includes('data-lang-redirect'));
   assert.ok(!(await read('ro/index.html')).includes('data-lang-redirect'));
 });
+
+test('home pages have the games section, a tilt card and organisation JSON-LD', async () => {
+  for (const file of ['index.html', 'ro/index.html']) {
+    const html = await read(file);
+    assert.ok(html.includes('id="games"'), file);
+    assert.ok(html.includes('data-tilt'), file);
+    const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(m => JSON.parse(m[1]));
+    const org = blocks.find(b => b['@type'] === 'Organization');
+    assert.ok(org, file);
+    assert.equal(org.legalName, 'Paquett Studio Ltd');
+    assert.equal(org.url, 'https://paquettstudio.com');
+  }
+});
