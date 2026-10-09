@@ -1,4 +1,4 @@
-import { initMenu, initReveal, initTilt, initGlitchTap } from './ui.js';
+import { initMenu, initReveal, initTilt, initGlitchTap, initGallery } from './ui.js';
 import { initLangSwitch } from './i18n.js';
 import { createSfx } from './sfx.js';
 import { createInput } from './fx/input.js';
@@ -16,6 +16,7 @@ initLangSwitch(document, storage);
 initReveal(document);
 initTilt(document);
 initGlitchTap(document);
+initGallery(document);
 
 const sfx = createSfx({ storage, AudioCtx: window.AudioContext ?? window.webkitAudioContext });
 const soundButtons = [...document.querySelectorAll('[data-sound-toggle]')];

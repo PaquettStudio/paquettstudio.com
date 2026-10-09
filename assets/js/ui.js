@@ -73,6 +73,32 @@ export function initTilt(doc) {
   }
 }
 
+// Screenshot gallery: native swipe + scroll-snap on touch; arrow buttons for mouse users.
+export function initGallery(doc) {
+  const win = doc.defaultView;
+  const finePointer = win.matchMedia?.('(pointer: fine)').matches;
+  for (const gallery of doc.querySelectorAll('[data-gallery]')) {
+    const track = gallery.querySelector('.gallery-track');
+    const prev = gallery.querySelector('.gallery-btn.prev');
+    const next = gallery.querySelector('.gallery-btn.next');
+    if (!track || !prev || !next) continue;
+    const step = () => (track.querySelector('.shot')?.getBoundingClientRect().width ?? track.clientWidth) + 16;
+    const update = () => {
+      prev.disabled = track.scrollLeft <= 2;
+      next.disabled = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+    };
+    if (finePointer) {
+      prev.hidden = false;
+      next.hidden = false;
+    }
+    prev.addEventListener('click', () => track.scrollBy({ left: -step(), behavior: 'smooth' }));
+    next.addEventListener('click', () => track.scrollBy({ left: step(), behavior: 'smooth' }));
+    track.addEventListener('scroll', update, { passive: true });
+    win.addEventListener('resize', update);
+    update();
+  }
+}
+
 // Touch has no hover, so a tap triggers the glitch for a moment.
 export function initGlitchTap(doc) {
   for (const el of doc.querySelectorAll('.glitch-on-hover')) {

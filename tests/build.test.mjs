@@ -75,3 +75,35 @@ test('home pages have the games section, a tilt card and organisation JSON-LD', 
     assert.equal(org.url, 'https://paquettstudio.com');
   }
 });
+
+const OFFICIAL = {
+  'games/abyss-angler/index.html': {
+    text: 'Abyss Angler is developed and published exclusively by Paquett Studio Ltd. The only official versions are listed here. Any other listing is unauthorised — please report it.',
+    report: '/report/',
+  },
+  'ro/games/abyss-angler/index.html': {
+    text: 'Abyss Angler este dezvoltat și publicat exclusiv de Paquett Studio Ltd. Singurele versiuni oficiale sunt cele listate aici. Orice altă listare este neautorizată — te rugăm să o raportezi.',
+    report: '/ro/report/',
+  },
+};
+
+test('the game page states the official releases and links the right report page', async () => {
+  for (const [file, { text, report }] of Object.entries(OFFICIAL)) {
+    const html = await read(file);
+    assert.ok(html.includes(text), file);
+    const box = html.match(/<section[^>]*class="[^"]*official[^"]*"[\s\S]*?<\/section>/)?.[0] ?? '';
+    assert.ok(box.includes(`href="${report}"`), file);
+  }
+});
+
+test('the game page describes the game as structured data published by the company', async () => {
+  for (const file of Object.keys(OFFICIAL)) {
+    const html = await read(file);
+    const blocks = [...html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)].map(m => JSON.parse(m[1]));
+    const game = blocks.find(b => b['@type'] === 'VideoGame');
+    assert.ok(game, file);
+    assert.equal(game.name, 'Abyss Angler');
+    assert.equal(game.publisher.legalName, 'Paquett Studio Ltd');
+    assert.deepEqual(game.gamePlatform, ['iOS', 'Android']);
+  }
+});

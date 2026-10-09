@@ -56,6 +56,23 @@ export function organizationLd(site) {
   };
 }
 
+export function videoGameLd(site, gameKey, url) {
+  const g = site.games[gameKey];
+  const org = organizationLd(site);
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'VideoGame',
+    name: g.name,
+    url: `${site.baseUrl}${url}`,
+    gamePlatform: ['iOS', 'Android'],
+    operatingSystem: 'iOS, Android',
+    applicationCategory: 'GameApplication',
+    author: { '@type': 'Organization', name: org.name, legalName: org.legalName, url: org.url },
+    publisher: { '@type': 'Organization', name: org.name, legalName: org.legalName, url: org.url },
+    sameAs: [g.appStore, g.googlePlay],
+  };
+}
+
 function socialHtml(site) {
   if (!site.social?.length) return '';
   const items = site.social.map(s => `<li><a href="${escapeHtml(s.url)}" rel="me noopener">${escapeHtml(s.name)}</a></li>`);
@@ -76,7 +93,8 @@ function contextFor(page, pages, site, strings, partials) {
     links,
     alternatesHtml: alternatesHtml(page, pages, site),
     langSwitchHtml: langSwitchHtml(page, pages, site, strings[lang.code]),
-    jsonLdHtml: jsonLd(organizationLd(site)),
+    jsonLdHtml: [organizationLd(site), meta.game && videoGameLd(site, meta.game, urlFor(lang.prefix, meta.path))]
+      .filter(Boolean).map(jsonLd).join('\n'),
     socialHtml: socialHtml(site),
     headExtraHtml: headExtraHtml(page, site, partials),
     noticeHtml: '',
