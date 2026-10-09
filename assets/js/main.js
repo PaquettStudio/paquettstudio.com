@@ -19,6 +19,8 @@ initGlitchTap(document);
 initGallery(document);
 
 const sfx = createSfx({ storage, AudioCtx: window.AudioContext ?? window.webkitAudioContext });
+// The idle game plays its sounds through this instance, so the header switch controls them too.
+window.paquettSfx = sfx;
 const soundButtons = [...document.querySelectorAll('[data-sound-toggle]')];
 const syncSound = () => soundButtons.forEach(b => b.setAttribute('aria-pressed', String(sfx.isOn())));
 soundButtons.forEach(b => {

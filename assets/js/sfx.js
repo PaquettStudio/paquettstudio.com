@@ -44,6 +44,21 @@ export function createSfx({ storage, AudioCtx }) {
       tone(ac, 988, t, 0.3, 'sine', 0.05);
       tone(ac, 1319, t + 0.08, 0.3, 'sine', 0.05);
     },
+    // Abyss Angler Idle: a line whipping out, a soft plop, a little fanfare, a coin chime.
+    cast(ac, t) {
+      tone(ac, 1200, t, 0.22, 'triangle', 0.04, 300);
+      tone(ac, 180, t + 0.2, 0.18, 'sine', 0.05, 90);
+    },
+    catch(ac, t) {
+      tone(ac, 660, t, 0.12, 'sine', 0.04, 990);
+    },
+    newSpecies(ac, t) {
+      [784, 988, 1175, 1568].forEach((f, i) => tone(ac, f, t + i * 0.07, 0.4, 'triangle', 0.045));
+    },
+    coins(ac, t) {
+      tone(ac, 1568, t, 0.18, 'square', 0.02);
+      tone(ac, 2093, t + 0.06, 0.28, 'square', 0.02);
+    },
   };
 
   return {

@@ -1,20 +1,27 @@
-// Abyss Angler Idle — wires data, state, simulation, input and drawing into one loop.
+// Abyss Angler Idle — wires data, state, simulation, input, drawing and panels into one loop.
 import { loadData } from './data.js';
-import { load, save, touch, derived } from './state.js';
+import { load, save, touch, buy, reset, idleEarnings, ECONOMY } from './state.js';
 import { WORLD_WIDTH, createRng, createSession, requestCast, stepCast, finishCast, reelIn } from './sim.js';
 import { createSteer } from './input.js';
 import { createRenderer } from './render.js';
+import { createUi, caughtText, newSpeciesText } from './ui.js';
 
 const root = document.querySelector('[data-play]');
 const canvas = root?.querySelector('[data-canvas]');
-const castButton = root?.querySelector('[data-cast]');
+const stage = root?.querySelector('[data-stage]');
 const hud = root?.querySelector('[data-hud]');
 
 let storage = null;
 try { storage = window.localStorage; } catch { storage = null; }
+let sessionStore = null;
+try { sessionStore = window.sessionStorage; } catch { sessionStore = null; }
 
 const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
   || new URLSearchParams(location.search).has('reduced-motion');
+const MAX_LINE = ECONOMY.lineDepths[ECONOMY.lineDepths.length - 1];
+
+// The site's main.js owns the sound switch in the header; play through its instance.
+const sound = name => window.paquettSfx?.play(name);
 
 function loadImage(src) {
   const img = new Image();
@@ -23,15 +30,20 @@ function loadImage(src) {
   return img;
 }
 
-function zoneName(zones, depth) {
-  return (zones.find(z => depth >= z.top && depth < z.bottom) ?? zones[zones.length - 1]).name;
-}
-
 async function start() {
   const { zones, species, speciesById } = await loadData();
   let state = load(storage);
   const session = createSession();
   const rng = createRng((Date.now() ^ 0x5eed) >>> 0);
+
+  // Idle earnings are counted once, up to the moment the page opened. Until they are
+  // collected, lastSeen stays where it was so closing the page early loses nothing.
+  const openedAt = Date.now();
+  let pending = idleEarnings(state, openedAt, speciesById);
+  if (!(pending.minutes > 1 && pending.coins > 0)) pending = null;
+  const stamp = s => (pending ? s : touch(s, Date.now()));
+  state = stamp(state);
+  save(storage, state);
 
   const images = {
     vessel: [0, 1, 2].map(i => loadImage(`/assets/img/play/vessel-${i}.webp`)),
@@ -40,78 +52,112 @@ async function start() {
     fish: Object.fromEntries(species.map(s => [s.id, loadImage(`/${s.art}`)])),
   };
   const renderer = createRenderer(canvas, { images, speciesById, reducedMotion });
-  const steer = createSteer(root, () => canvas.getBoundingClientRect());
 
-  const hooks = { onCastFinished: () => {}, onStateChanged: () => {} };
-  const api = {
-    get state() { return state; },
-    setState(next) { state = next; save(storage, state); hooks.onStateChanged(state); renderHud(); },
-    get cast() { return session.cast; },
-    hooks, zones, species, speciesById, storage,
-  };
+  function commit(next) {
+    state = stamp(next);
+    save(storage, state);
+    ui.render(state, session.cast);
+  }
 
-  function renderHud() {
-    const cast = session.cast;
-    const depth = cast && cast.phase !== 'done' ? cast.hook.depth : 0;
-    const { holdSize } = derived(state);
-    const caught = cast && cast.phase !== 'done' ? cast.caught.length : 0;
-    hud.innerHTML = `<span class="play-pill">${Math.round(depth)} m · ${zoneName(zones, depth)}</span>`
-      + `<span class="play-pill play-coins">🪙 ${state.coins.toLocaleString('en-GB')}</span>`
-      + `<span class="play-pill">Hold ${caught} / ${holdSize}</span>`;
-    const active = cast && cast.phase !== 'done';
-    castButton.textContent = !active ? 'Cast' : cast.phase === 'sinking' ? 'Reel in' : 'Reeling…';
-    castButton.disabled = !!active && cast.phase === 'reeling';
+  let hideWelcome = null;
+  function collect({ quiet = false } = {}) {
+    if (!pending) return;
+    const coins = pending.coins;
+    pending = null;
+    hideWelcome?.();
+    commit({ ...state, coins: state.coins + coins });
+    if (quiet) return;
+    sound('coins');
+    ui.announce(`Collected ${coins.toLocaleString('en-GB')} coins`);
   }
 
   function castOrReel() {
     if (requestCast(session, state, species, rng, { instant: reducedMotion })) {
-      hooks.onCast?.();
+      sound('cast');
     } else {
       reelIn(session.cast);
     }
-    renderHud();
+    ui.render(state, session.cast);
   }
-  castButton.addEventListener('click', castOrReel);
+
+  const ui = createUi(root, {
+    species, zones, speciesById, sessionStore,
+    onCast: castOrReel,
+    onBuy(id) {
+      const result = buy(state, id);
+      if (!result.ok) return;
+      commit(result.state);
+      sound('coins');
+    },
+    onCollect: () => collect(),
+    onReset() {
+      reset(storage);
+      pending = null;
+      hideWelcome?.();
+      session.cast = null;
+      commit(load(storage));
+    },
+  });
+
+  const steer = createSteer(stage, () => canvas.getBoundingClientRect(), document);
   steer.onCast(castOrReel);
+
+  function finish(cast) {
+    const result = finishCast(state, cast, speciesById);
+    commit(result.state);
+    if (result.coins > 0) sound('coins');
+    if (result.newSpecies.length) {
+      const list = result.newSpecies.map(id => speciesById[id]);
+      ui.showNewSpecies(list);
+      ui.announce(list.map(newSpeciesText).join('. '));
+      sound('newSpecies');
+    }
+    if (Object.keys(state.collection).length >= species.length) ui.showCta('complete');
+  }
 
   const drawScene = time => renderer.draw({ cast: session.cast && session.cast.phase !== 'done' ? session.cast : null, state, time });
 
   let prev = 0;
   let running = false;
-  let lastHud = 0;
+  let lastUi = 0;
+  let seenCatches = 0;
   function frame(time) {
     if (!running) return;
     const dt = prev ? (time - prev) / 1000 : 1 / 60;
     prev = time;
     const cast = session.cast;
     if (cast && cast.phase !== 'done') {
+      if (cast.caught.length === 0) seenCatches = 0;
       stepCast(cast, dt, { targetX: steer.targetX01 * WORLD_WIDTH }, rng);
-      if (cast.phase === 'done') {
-        const result = finishCast(state, cast, speciesById);
-        state = touch(result.state, Date.now());
-        save(storage, state);
-        hooks.onCastFinished(result, cast);
-        hooks.onStateChanged(state);
+      while (seenCatches < cast.caught.length) {
+        const { speciesId, weight } = cast.caught[seenCatches++];
+        ui.announce(caughtText(speciesById[speciesId], weight));
+        sound('catch');
       }
+      if (cast.hook.depth >= MAX_LINE) ui.showCta('forgotten-sea');
+      if (cast.phase === 'done') { seenCatches = 0; finish(cast); }
     }
-    if (time - lastHud > 100) { renderHud(); lastHud = time; }
+    if (time - lastUi > 100) { ui.render(state, session.cast); lastUi = time; }
     drawScene(time);
     requestAnimationFrame(frame);
   }
   const resume = () => { if (running) return; running = true; prev = 0; requestAnimationFrame(frame); };
-  const pause = () => { running = false; state = touch(state, Date.now()); save(storage, state); };
+  const persist = () => { state = stamp(state); save(storage, state); };
+  // Leaving with the welcome card still open banks the coins, so open time never counts as idle.
+  const pause = () => { running = false; collect({ quiet: true }); persist(); };
 
   document.addEventListener('visibilitychange', () => (document.hidden ? pause() : resume()));
   window.addEventListener('pagehide', pause);
   // Resizing clears the canvas; redraw at once so a paused sea never goes blank.
   window.addEventListener('resize', () => { renderer.resize(); drawScene(performance.now()); });
-  setInterval(() => { if (running) { state = touch(state, Date.now()); save(storage, state); } }, 30_000);
+  setInterval(() => { if (running) persist(); }, 30_000);
 
   renderer.resize();
   drawScene(performance.now());
-  renderHud();
+  ui.render(state, null);
+  if (pending) hideWelcome = ui.showWelcomeBack(pending);
   if (!document.hidden) resume();
-  return api;
+  return { get state() { return state; }, get cast() { return session.cast; }, ui };
 }
 
 if (root && canvas) {

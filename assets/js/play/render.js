@@ -1,5 +1,6 @@
 // Abyss Angler Idle — draws the sea, the vessel, the line, the lure, fish and sharks.
 import { WORLD_WIDTH } from './sim.js';
+import { ECONOMY } from './state.js';
 
 // Water colour by depth: bright lagoon → deep blue → readable blue-violet (never pure black).
 const WATER = [
@@ -8,6 +9,7 @@ const WATER = [
 ];
 const VESSEL_METRES = [11, 15, 21];
 const CELL = 25; // metres per particle cell
+const LINE_END = ECONOMY.lineDepths[ECONOMY.lineDepths.length - 1];
 
 function waterAt(depth) {
   if (depth <= WATER[0][0]) return WATER[0][1];
@@ -105,6 +107,24 @@ export function createRenderer(canvas, { images, speciesById, reducedMotion }) {
         }
       }
       ctx.restore();
+    }
+
+    // The Forgotten Sea: a locked curtain just below the line's last metre.
+    const curtainY = y(LINE_END);
+    if (curtainY < h) {
+      const veil = ctx.createLinearGradient(0, curtainY - 40, 0, curtainY + 80);
+      veil.addColorStop(0, 'rgba(12,6,30,0)');
+      veil.addColorStop(0.35, 'rgba(12,6,30,0.85)');
+      veil.addColorStop(1, 'rgba(8,4,20,0.97)');
+      ctx.fillStyle = veil;
+      ctx.fillRect(0, curtainY - 40, w, h - curtainY + 40);
+      ctx.textAlign = 'center';
+      ctx.fillStyle = 'rgba(255,255,255,0.88)';
+      ctx.font = '600 13px Inter, system-ui, sans-serif';
+      ctx.fillText('🔒 THE FORGOTTEN SEA', w / 2, curtainY + 34);
+      ctx.fillStyle = 'rgba(255,255,255,0.6)';
+      ctx.font = '12px Inter, system-ui, sans-serif';
+      ctx.fillText('Only in the full game', w / 2, curtainY + 54);
     }
 
     // Waterline.

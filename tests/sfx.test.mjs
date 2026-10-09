@@ -76,3 +76,12 @@ test('a browser without WebAudio stays silent without errors', () => {
   assert.equal(sfx.toggle(), true);
   assert.doesNotThrow(() => sfx.play('tap'));
 });
+
+test('the idle game sounds build oscillators when sound is on', () => {
+  for (const name of ['cast', 'catch', 'newSpecies', 'coins']) {
+    const { FakeAudioContext, stats } = spyAudio();
+    const sfx = createSfx({ storage: memoryStorage({ 'paquett.sound': '1' }), AudioCtx: FakeAudioContext });
+    sfx.play(name);
+    assert.ok(stats.oscillators > 0, name);
+  }
+});

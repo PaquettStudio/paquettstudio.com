@@ -65,3 +65,19 @@ test('keys typed into buttons are left to the buttons', () => {
   target.dispatchEvent(event('keydown', { key: ' ', target: { closest: sel => (sel.includes('button') ? {} : null) } }));
   assert.equal(casts, 0);
 });
+
+test('keys can be heard page-wide while only the sea takes the pointer', () => {
+  const sea = new EventTarget();
+  const page = new EventTarget();
+  const steer = createSteer(sea, rect, page);
+  let casts = 0;
+  steer.onCast(() => casts++);
+  page.dispatchEvent(event('keydown', { key: 'ArrowRight' }));
+  page.dispatchEvent(event('keydown', { key: 'Enter' }));
+  assert.ok(Math.abs(steer.targetX01 - 0.54) < 1e-9, String(steer.targetX01));
+  assert.equal(casts, 1);
+  sea.dispatchEvent(event('keydown', { key: 'ArrowRight' }));
+  assert.ok(Math.abs(steer.targetX01 - 0.54) < 1e-9, 'keys on the sea itself are not counted twice');
+  page.dispatchEvent(event('pointermove', { pointerType: 'mouse', clientX: 100 }));
+  assert.ok(Math.abs(steer.targetX01 - 0.54) < 1e-9, 'the mouse over the page does not steer');
+});
